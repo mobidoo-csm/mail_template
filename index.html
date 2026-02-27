@@ -27,7 +27,8 @@
         header {
             background: linear-gradient(to right, var(--sauce-orange), var(--sauce-orange-deep));
             color: var(--sauce-white);
-            padding: 60px 20px;
+            /* [수정 포인트] 아래쪽 패딩을 60px에서 100px로 늘려 텍스트 공간을 확보했습니다 */
+            padding: 60px 20px 100px;
             text-align: center;
             box-shadow: 0 4px 20px rgba(255, 95, 0, 0.2);
         }
@@ -47,6 +48,7 @@
 
         .container {
             max-width: 1000px;
+            /* [디자인 유지] 겹치는 효과를 위해 마이너스 마진을 그대로 유지합니다 */
             margin: -40px auto 60px;
             padding: 0 20px;
         }
@@ -54,6 +56,7 @@
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-auto-rows: 1fr;
             gap: 25px;
         }
 
@@ -93,21 +96,40 @@
             margin-bottom: 25px;
         }
 
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         .btn {
-            display: inline-block;
-            background-color: var(--sauce-black);
-            color: var(--sauce-white);
+            display: block;
             text-decoration: none;
             text-align: center;
             padding: 12px 0;
             border-radius: 12px;
             font-weight: bold;
             font-size: 14px;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
         }
 
-        .btn:hover {
+        .btn-view {
+            background-color: var(--sauce-black);
+            color: var(--sauce-white);
+        }
+        .btn-view:hover {
+            background-color: #333333;
+        }
+
+        .btn-copy {
             background-color: var(--sauce-orange);
+            color: var(--sauce-white);
+        }
+        .btn-copy:hover {
+            background-color: var(--sauce-orange-deep);
         }
 
         footer {
@@ -116,6 +138,30 @@
             color: #94a3b8;
             font-size: 13px;
         }
+
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--sauce-black);
+            color: #fff;
+            text-align: center;
+            border-radius: 50px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
         @media (max-width: 600px) {
             header h1 { font-size: 24px; }
@@ -126,8 +172,8 @@
 <body>
 
 <header>
-    <h1>소스라이브 고객 여정 FLOW 템플릿</h1>
-    <p>파트너사 온보딩 및 첫 방송 지원을 위한 통합 메일 템플릿 저장소</p>
+    <h1>💌 소스라이브 고객 여정 메일 템플릿 💌</h1>
+    <p>파트너사 계정 안내 및 온보딩 등 첫 방송 지원을 위한 통합 메일 템플릿 저장소</p>
 </header>
 
 <div class="container">
@@ -135,50 +181,96 @@
         <div class="card">
             <div class="icon">👋</div>
             <h2>1. 웰컴 메일</h2>
-            <p>신규 파트너사에게 발송하는 첫 인사 메일입니다. 소스라이브의 가치와 파트너십의 시작을 알립니다.</p>
-            <a href="https://mobidoo-csm.github.io/mail_template/page/welcome.html" target="_blank" class="btn">템플릿 보기</a>
+            <p>신규 고객사에게 발송하는 첫 인사 메일입니다. 소스라이브의 가치와 함께 하는 여정의 시작을 알립니다.</p>
+            <div class="btn-group">
+                <a href="https://mobidoo-csm.github.io/mail_template/page/welcome.html" target="_blank" class="btn btn-view">템플릿 보기</a>
+                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/welcome.html')" class="btn btn-copy">템플릿 복사하기</button>
+            </div>
         </div>
 
         <div class="card">
             <div class="icon">🔑</div>
             <h2>2. 계정 정보 안내</h2>
-            <p>서비스 이용을 위한 파트너/어드민 계정 정보와 첫 로그인 가이드를 제공합니다.</p>
-            <a href="https://mobidoo-csm.github.io/mail_template/page/account.html" target="_blank" class="btn">템플릿 보기</a>
+            <p>서비스 이용을 위한 어드민 계정 정보와 사용자 가이드를 제공합니다.</p>
+            <div class="btn-group">
+                <a href="https://mobidoo-csm.github.io/mail_template/page/account.html" target="_blank" class="btn btn-view">템플릿 보기</a>
+                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/account.html')" class="btn btn-copy">템플릿 복사하기</button>
+            </div>
         </div>
 
         <div class="card">
             <div class="icon">📅</div>
             <h2>3. 온보딩 일정 안내</h2>
-            <p>확정된 온보딩 세션의 일시 및 장소를 안내하고 사전 설문을 유도하는 인비테이션입니다.</p>
-            <a href="https://mobidoo-csm.github.io/mail_template/page/onboarding.html" target="_blank" class="btn">템플릿 보기</a>
+            <p>확정된 온보딩 세션의 일시 및 장소를 안내하고 온보딩 진행 내용 관련 사전 설문을 요청합니다.</p>
+            <div class="btn-group">
+                <a href="https://mobidoo-csm.github.io/mail_template/page/onboarding.html" target="_blank" class="btn btn-view">템플릿 보기</a>
+                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/onboarding.html')" class="btn btn-copy">템플릿 복사하기</button>
+            </div>
         </div>
 
         <div class="card">
             <div class="icon">📝</div>
             <h2>4. 온보딩 후속 안내</h2>
-            <p>세션 중 발생한 Q&A 정리와 플레이어 세부 설정을 위한 Config 설문을 안내합니다.</p>
-            <a href="https://mobidoo-csm.github.io/mail_template/page/onboarding2.html" target="_blank" class="btn">템플릿 보기</a>
+            <p>온보딩 세션 중 발생한 Q&A 정리와 플레이어 세부 설정을 위한 Config 설문을 안내합니다.</p>
+            <div class="btn-group">
+                <a href="https://mobidoo-csm.github.io/mail_template/page/onboarding2.html" target="_blank" class="btn btn-view">템플릿 보기</a>
+                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/onboarding2.html')" class="btn btn-copy">템플릿 복사하기</button>
+            </div>
         </div>
 
         <div class="card">
             <div class="icon">✅</div>
-            <h2>5. 첫방송 체크리스트</h2>
-            <p>성공적인 첫 송출을 위해 방송 직전 반드시 확인해야 할 기술/운영 항목들을 점검합니다.</p>
-            <a href="https://mobidoo-csm.github.io/mail_template/page/livechecklist.html" target="_blank" class="btn">템플릿 보기</a>
+            <h2>5. 첫 방송 전 체크리스트</h2>
+            <p>성공적인 첫 방송 진행을 위해 방송 직전 반드시 확인해야 할 기술/운영 항목들을 점검합니다.</p>
+            <div class="btn-group">
+                <a href="https://mobidoo-csm.github.io/mail_template/page/livechecklist.html" target="_blank" class="btn btn-view">템플릿 보기</a>
+                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/livechecklist.html')" class="btn btn-copy">템플릿 복사하기</button>
+            </div>
         </div>
 
         <div class="card">
             <div class="icon">🥂</div>
-            <h2>6. 첫방송 리포트</h2>
-            <p>방송 종료 후 성과 지표(UV/PV/클릭)를 공유하고 만족도 조사를 진행합니다.</p>
-            <a href="https://mobidoo-csm.github.io/mail_template/page/afterlive.html" target="_blank" class="btn">템플릿 보기</a>
+            <h2>6. 첫 방송 후 리포트</h2>
+            <p>방송 종료 후 성과 지표를 공유하고 만족도 조사를 진행합니다.</p>
+            <div class="btn-group">
+                <a href="https://mobidoo-csm.github.io/mail_template/page/afterlive.html" target="_blank" class="btn btn-view">템플릿 보기</a>
+                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/afterlive.html')" class="btn btn-copy">템플릿 복사하기</button>
+            </div>
         </div>
     </div>
 </div>
 
+<div id="toast">✅ 템플릿이 복사되었습니다! 메일 창에 붙여넣으세요.</div>
+
 <footer>
-    <p>© 2026 Sauce Customer Success Management. All Rights Reserved.</p>
+    <p>Copyright © 2026 mobidoo. All Rights Reserved.</p>
 </footer>
+
+<script>
+    async function copyRichText(url) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('파일을 가져올 수 없습니다.');
+            const htmlText = await response.text();
+
+            const type = "text/html";
+            const blob = new Blob([htmlText], { type });
+            const data = [new ClipboardItem({ [type]: blob })];
+
+            await navigator.clipboard.write(data);
+            showToast();
+        } catch (err) {
+            console.error(err);
+            alert('복사 중 오류가 발생했습니다. [템플릿 보기] 창에서 전체 선택(Ctrl+A) 후 복사해 주세요.');
+        }
+    }
+
+    function showToast() {
+        const toast = document.getElementById("toast");
+        toast.className = "show";
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+</script>
 
 </body>
 </html>
