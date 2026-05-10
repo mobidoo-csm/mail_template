@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauce CSM Mail Editor - Live Report</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --sauce-orange: #ff5f00;
+            --sauce-orange-hover: #e65600;
+            --sauce-black: #00020f;
+            --bg-workspace: #f3f4f6;
+            --panel-bg: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --border-color: #e5e7eb;
+            --btn-dark: #374151;
+            --btn-dark-hover: #111827;
+        }
+
+        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: var(--bg-workspace); display: flex; height: 100vh; overflow: hidden; color: var(--text-main); }
+
+        /* [좌측] 미리보기 영역 */
+        .preview-area { flex: 1; padding: 40px; overflow-y: auto; display: flex; justify-content: center; scroll-behavior: smooth; }
+
+        /* [우측] 제어 패널 */
+        .control-panel { width: 420px; background-color: var(--panel-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.03); }
+        .panel-header { padding: 30px 25px; background-color: var(--sauce-black); color: #ffffff; }
+        .panel-header h2 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--sauce-orange); }
+        .panel-header p { margin: 8px 0 0 0; font-size: 13px; opacity: 0.6; font-weight: 500; }
+        .panel-content { padding: 30px 25px; flex: 1; overflow-y: auto; }
+
+        .section { margin-bottom: 35px; }
+        .section-label { font-size: 12px; font-weight: 800; color: var(--sauce-orange); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 1px; }
+
+        .title-card { background-color: #f9fafb; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .title-preview-text { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.5; margin-bottom: 15px; word-break: break-all; }
+
+        /* 입력 그룹 */
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .input-group input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; font-family: inherit; }
+        .input-group input:focus { border-color: var(--sauce-orange); outline: none; box-shadow: 0 0 0 4px rgba(255, 95, 0, 0.1); }
+
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s; }
+        .btn-orange { background-color: var(--sauce-orange); color: white; margin-bottom: 12px; }
+        .btn-orange:hover { background-color: var(--sauce-orange-hover); transform: translateY(-1px); }
+        .btn-dark { background-color: var(--btn-dark); color: white; padding: 10px; font-size: 13px; }
+        .btn-dark:hover { background-color: var(--btn-dark-hover); transform: translateY(-1px); }
+
+        .help-text { font-size: 12px; color: var(--text-sub); text-align: center; margin-top: 15px; line-height: 1.6; }
+        #toast { visibility: hidden; min-width: 220px; background-color: var(--sauce-black); color: #fff; text-align: center; border-radius: 50px; padding: 14px 24px; position: fixed; z-index: 2000; left: 50%; bottom: 40px; transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2s; }
+
+        .var-fill { background-color: #fff9c4; color: #d84315; font-weight: bold; border-radius: 2px; padding: 0 2px; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 40px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <div class="preview-area">
+        <div id="copy-target">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4" style="font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;">
+              <tr>
+                <td align="center" style="padding: 40px 0;">
+                  <table width="600" border="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff" style="border: 1px solid #eeeeee; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 2, 15, 0.1);">
+                    
+                    <tr>
+                      <td style="padding: 50px 40px; text-align: center; background: #ff5f00; background: linear-gradient(to right, #ff5f00, #ff4713);">
+                        <div style="display: inline-block; background: rgba(0, 2, 15, 0.2); padding: 8px 16px; border-radius: 20px; color: #ffffff; font-size: 13px; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;">LIVE REPORT</div>
+                        <h1 style="font-size: 35px; color: #ffffff; margin: 0; letter-spacing: -1px; font-weight: 800;">첫 방송 완료를 축하드립니다! 🥂</h1>
+                        <p style="font-size: 18px; color: #ffffff; margin-top: 12px; line-height: 1.5; opacity: 0.9;">첫 방송의 성과를 주요 지표로 확인해 보세요.</p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 45px 45px 10px 45px;">
+                        <p style="font-size: 16px; color: #333333; line-height: 1.8; margin: 0;">
+                          <span id="p-company-intro" class="var-fill">{회사명}</span> <span id="p-manager" class="var-fill">{담당자명}</span>님, 안녕하세요!<br>
+                          모비두 고객성공팀 솔루션파트입니다😊<br><br>
+                          첫 방송, 정말 고생 많으셨습니다.<br>
+                          <span id="p-company-body" class="var-fill">{회사명}</span>의 첫 라이브 성과를 주요 지표로 정리해 드립니다.<br>
+                          다음 방송을 위한 참고 자료로 활용해 보세요.
+                        </p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 20px 30px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#f8f9fa; border-radius:12px; padding:25px 10px;">
+                          <tbody><tr><td align="center"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; border:1px solid #ddd; color:#999; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">1</div><div style="font-size:13px; color:#999;">계정 발급</div></td>
+                            <td width="30" style="padding-bottom:25px; color:#cccccc; text-align:center; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold;">&gt;</td>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; border:1px solid #ddd; color:#999; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">2</div><div style="font-size:13px; color:#999;">온보딩</div></td>
+                            <td width="30" style="padding-bottom:25px; color:#cccccc; text-align:center; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold;">&gt;</td>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; border:1px solid #ddd; color:#999; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">3</div><div style="font-size:13px; color:#999;">정합 및 테스트</div></td>
+                            <td width="30" style="padding-bottom:25px; color:#cccccc; text-align:center; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold;">&gt;</td>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; background-color:#ff5f00; color:#ffffff; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">4</div><div style="font-size:13px; font-weight:bold; color:#ff5f00;">첫 방송</div></td>
+                          </tr></tbody></table></td></tr></tbody>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 20px 40px 15px 40px;">
+                        <h3 style="font-size: 18px; margin: 0; color: #111827; line-height: 1.2;">
+                            <span style="background: #ff5f00; width: 4px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 10px;"></span>
+                            <span style="vertical-align: middle;"><span style="margin-right: 8px;">📊</span>첫 방송 주요 성과 지표</span>
+                        </h3>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 0px 45px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #00020f; border-radius: 20px; padding: 40px 20px; text-align: center;">
+                            <tr>
+                                <td width="33%">
+                                    <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">시청자 수 (UV)</div>
+                                    <div id="p-uv" style="font-size: 26px; font-weight: 800; color: #ffa400;" class="var-fill">{0,000}</div>
+                                </td>
+                                <td width="33%" style="border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1);">
+                                    <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">조회수 (PV)</div>
+                                    <div id="p-pv" style="font-size: 26px; font-weight: 800; color: #ffa400;" class="var-fill">{0,000}</div>
+                                </td>
+                                <td width="33%">
+                                    <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">상품 클릭 수</div>
+                                    <div id="p-click" style="font-size: 26px; font-weight: 800; color: #ffa400;" class="var-fill">{0,000}</div>
+                                </td>
+                            </tr>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center" style="padding: 20px 45px 0 45px;">
+                            <div style="background-color: #f8f9fa; border: 1px solid #eeeeee; border-radius: 12px; padding: 12px 20px; display: inline-block;">
+                                <p style="font-size: 13px; color: #475569; margin: 0; line-height: 1.4;">
+                                    💡 더 상세한 성과 분석은 소스라이브 어드민의 <b style="color: #ff5f00;">[분석]</b> 탭에서 확인해 보세요.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 50px 45px 40px 45px; text-align: center;">
+                        <div style="background-color: #f8f9fa; border-radius: 20px; padding: 40px 30px; border: 1px solid #eeeeee;">
+                            <h3 style="font-size: 19px; color: #00020f; margin: 0 0 10px 0; font-weight: 800;">🤝 소스라이브와 함께한 여정, 어떠셨나요?</h3>
+                            <p style="font-size: 14px; color: #666666; line-height: 1.6; margin: 0 0 30px 0;">이번 방송 경험에 대한 간단한 의견을 남겨 주세요.<br>전달해 주신 소중한 피드백은 더 나은 서비스를 만드는 데 도움이 됩니다.</p>
+                            <table width="280" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
+                                <tr><td align="center" bgcolor="#ff5f00" style="border-radius: 30px; padding: 16px 0; box-shadow: 0 4px 10px rgba(255, 95, 0, 0.2);"><a href="https://tally.so/r/pbLLdE" target="_blank" style="font-size: 15px; font-weight: bold; color: #ffffff; text-decoration: none; display: block; width: 100%;">👉 첫 방송 피드백 설문 참여하기</a></td></tr>
+                            </table>
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 30px; background-color: #fff4f2; border-radius: 12px; border: 1px dashed #ff5f00;">
+                                <tr><td style="padding: 15px; font-size: 15px; color: #ff4713; font-weight: bold;">☕ 설문 완료 시 감사의 의미로 스타벅스 1만원권을 전달드려요!</td></tr>
+                            </table>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr><td style="padding: 0 40px;"><div style="border-top: 1px solid #eeeeee;"></div></td></tr>
+
+                    <tr>
+                      <td style="padding: 40px 40px 20px 40px; text-align: center;">
+                        <p style="font-size: 16px; color: #111827; line-height: 1.7; margin: 0;">
+                          <span id="p-company-bottom" class="var-fill">{회사명}</span>의 다음 라이브도 더 좋은 성과로 이어질 수 있도록<br>
+                          소스라이브가 언제든 함께 고민하겠습니다.🍀
+                        </p>
+                      </td>
+                    </tr>
+
+                    <tr><td style="padding: 30px 40px 60px 40px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #e5e7eb; border-radius: 16px;">
+                          <tr><td style="padding: 24px;"><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td valign="middle"><div style="font-size: 16px; font-weight: bold; color: #111827; margin-bottom: 6px;">💬 문의하기</div><div style="font-size: 13px; color: #6b7280;">궁금한 점은 카카오 채널 또는 메일로 문의해 주세요.</div></td><td width="180" valign="middle" align="right" style="padding-left: 15px;"><a href="https://pf.kakao.com/_CKxeSG" target="_blank" style="display: block; width: 100%; background-color: #fee500; color: #3c1e1e; text-decoration: none; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: bold; margin-bottom: 8px; text-align: center;">🔗 카카오 채널 문의</a><a href="mailto:csm_sol@mobidoo.co.kr" style="display: block; width: 100%; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: bold; text-align: center;">💌 메일 보내기</a></td></tr></table></td></tr>
+                        </table>
+                    </td></tr>
+                    <tr><td bgcolor="#f8f9fa" style="padding: 30px 40px; border-top: 1px solid #eeeeee; text-align: center;"><p style="font-size: 12px; color: #aaa; margin: 0;">Copyright © 2026 mobidoo. All Rights Reserved.</p></td></tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="panel-header">
+            <h2>Sauce CSM Mail Editor</h2>
+            <p>[소스라이브] LIVE REPORT</p>
+        </div>
+        
+        <div class="panel-content">
+            <div class="section">
+                <span class="section-label">Email Title</span>
+                <div class="title-card">
+                    <div class="title-preview-text" id="title-preview">[소스라이브] {회사명} 첫 방송 완료를 축하드립니다! 🥂</div>
+                    <button class="btn btn-dark" onclick="copyTitle()">제목 복사하기</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Common Variables</span>
+                <div class="input-group"><label>고객사명</label><input type="text" id="i-company" placeholder="회사명 입력" oninput="syncAll()"></div>
+                <div class="input-group"><label>담당자 이름</label><input type="text" id="i-manager" placeholder="이름 입력" oninput="syncAll()"></div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Performance Metrics</span>
+                <div class="input-group"><label>시청자 수 (UV)</label><input type="text" id="i-uv" placeholder="예: 1240" oninput="syncAll()"></div>
+                <div class="input-group"><label>조회수 (PV)</label><input type="text" id="i-pv" placeholder="예: 3500" oninput="syncAll()"></div>
+                <div class="input-group"><label>상품 클릭 수</label><input type="text" id="i-click" placeholder="예: 450" oninput="syncAll()"></div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Actions</span>
+                <button class="btn btn-orange" onclick="copyMail()">메일 본문 복사하기</button>
+                <div class="help-text">숫자 입력 시 자동으로 콤마(,)가 포함됩니다.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">복사 완료!</div>
+
+    <script>
+        // 숫자 세 자리마다 콤마를 찍어주는 헬퍼 함수
+        function formatNumber(num) {
+            if (!num || num === '{0,000}') return num;
+            // 기존 콤마 제거 후 숫자만 남김
+            let value = num.toString().replace(/,/g, '');
+            // 숫자가 아니면 그대로 반환, 숫자면 콤마 추가
+            if (isNaN(value) || value === "") return num;
+            return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function syncAll() {
+            const company = document.getElementById('i-company').value || '{회사명}';
+            const manager = document.getElementById('i-manager').value || '{담당자명}';
+            
+            // 입력값에서 콤마 포맷팅 적용
+            const uv = formatNumber(document.getElementById('i-uv').value) || '{0,000}';
+            const pv = formatNumber(document.getElementById('i-pv').value) || '{0,000}';
+            const click = formatNumber(document.getElementById('i-click').value) || '{0,000}';
+
+            // 텍스트 반영
+            document.getElementById('p-company-intro').innerText = company;
+            document.getElementById('p-company-body').innerText = company;
+            document.getElementById('p-company-bottom').innerText = company;
+            document.getElementById('p-manager').innerText = manager;
+            document.getElementById('p-uv').innerText = uv;
+            document.getElementById('p-pv').innerText = pv;
+            document.getElementById('p-click').innerText = click;
+            
+            // 제목 반영
+            document.getElementById('title-preview').innerText = `[소스라이브] ${company} 첫 방송 완료를 축하드립니다! 🥂`;
+
+            // 하이라이트 제어
+            toggleHighlight(document.getElementById('p-company-intro'), company === '{회사명}');
+            toggleHighlight(document.getElementById('p-company-body'), company === '{회사명}');
+            toggleHighlight(document.getElementById('p-company-bottom'), company === '{회사명}');
+            toggleHighlight(document.getElementById('p-manager'), manager === '{담당자명}');
+            toggleHighlight(document.getElementById('p-uv'), uv === '{0,000}');
+            toggleHighlight(document.getElementById('p-pv'), pv === '{0,000}');
+            toggleHighlight(document.getElementById('p-click'), click === '{0,000}');
+        }
+
+        function toggleHighlight(el, isDimmed) {
+            isDimmed ? el.classList.add('var-fill') : el.classList.remove('var-fill');
+        }
+
+        function copyTitle() {
+            const text = document.getElementById('title-preview').innerText;
+            navigator.clipboard.writeText(text).then(() => showToast("제목이 복사되었습니다."));
+        }
+
+        async function copyMail() {
+            const fills = document.querySelectorAll('.var-fill');
+            fills.forEach(f => f.style.backgroundColor = 'transparent');
+            
+            const root = document.getElementById('copy-target');
+            const html = root.innerHTML;
+
+            try {
+                const blob = new Blob([html], { type: 'text/html' });
+                const data = [new ClipboardItem({ 'text/html': blob })];
+                await navigator.clipboard.write(data);
+                showToast("본문이 복사되었습니다.");
+            } catch (err) {
+                alert("복사 실패! 크롬 브라우저를 권장합니다.");
+            }
+
+            fills.forEach(f => f.style.backgroundColor = '');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg; t.className = "show";
+            setTimeout(() => { t.className = ""; }, 2000);
+        }
+
+        window.onload = syncAll;
+    </script>
+</body>
+</html>

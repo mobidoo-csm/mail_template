@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauce CSM Mail Editor - Account Info</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --sauce-orange: #ff5f00;
+            --sauce-orange-hover: #e65600;
+            --sauce-black: #00020f;
+            --bg-workspace: #f3f4f6;
+            --panel-bg: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --border-color: #e5e7eb;
+            --btn-dark: #374151;
+            --btn-dark-hover: #111827;
+        }
+
+        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: var(--bg-workspace); display: flex; height: 100vh; overflow: hidden; color: var(--text-main); }
+
+        /* [좌측] 미리보기 영역 */
+        .preview-area { flex: 1; padding: 40px; overflow-y: auto; display: flex; justify-content: center; scroll-behavior: smooth; }
+
+        /* [우측] 제어 패널 */
+        .control-panel { width: 420px; background-color: var(--panel-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.03); }
+        .panel-header { padding: 30px 25px; background-color: var(--sauce-black); color: #ffffff; }
+        .panel-header h2 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--sauce-orange); }
+        .panel-header p { margin: 8px 0 0 0; font-size: 13px; opacity: 0.6; font-weight: 500; }
+        .panel-content { padding: 30px 25px; flex: 1; overflow-y: auto; }
+
+        .section { margin-bottom: 35px; }
+        .section-label { font-size: 12px; font-weight: 800; color: var(--sauce-orange); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 1px; }
+
+        .title-card { background-color: #f9fafb; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .title-preview-text { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.5; margin-bottom: 15px; word-break: break-all; }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .input-row { display: flex; gap: 8px; }
+        .input-group input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; font-family: inherit; }
+        .input-group input:focus { border-color: var(--sauce-orange); outline: none; box-shadow: 0 0 0 4px rgba(255, 95, 0, 0.1); }
+
+        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .check-item input { width: 18px; height: 18px; accent-color: var(--sauce-orange); cursor: pointer; }
+
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s; }
+        .btn-orange { background-color: var(--sauce-orange); color: white; margin-bottom: 12px; }
+        .btn-orange:hover { background-color: var(--sauce-orange-hover); transform: translateY(-1px); }
+        .btn-dark { background-color: var(--btn-dark); color: white; padding: 10px; font-size: 13px; }
+        
+        /* 암호 생성 전용 버튼 */
+        .btn-gen { width: 80px; padding: 0; background-color: #f1f5f9; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .btn-gen:hover { background-color: #e2e8f0; }
+
+        .help-text { font-size: 12px; color: var(--text-sub); text-align: center; margin-top: 15px; line-height: 1.6; }
+        #toast { visibility: hidden; min-width: 220px; background-color: var(--sauce-black); color: #fff; text-align: center; border-radius: 50px; padding: 14px 24px; position: fixed; z-index: 2000; left: 50%; bottom: 40px; transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2s; }
+
+        .var-fill { background-color: #fff9c4; color: #d84315; font-weight: bold; border-radius: 2px; padding: 0 2px; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 40px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 40px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <div class="preview-area">
+        <div id="copy-target">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4" style="font-family: 'Pretendard', sans-serif;">
+              <tr>
+                <td align="center" style="padding: 40px 0;">
+                  <table width="600" border="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff" style="border: 1px solid #eeeeee; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    
+                    <tr>
+                      <td bgcolor="#00020f" style="padding: 50px 40px; text-align: center;">
+                        <div style="display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; color: #ffffff; font-size: 13px; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;">ACCOUNT INFORMATION</div>
+                        <h1 style="font-size: 35px; color: #ff5f00; margin: 0; letter-spacing: -1px; font-weight: 800;">소스라이브 계정 안내 💌</h1>
+                        <p style="font-size: 18px; color: #ffffff; margin-top: 12px; line-height: 1.5; opacity: 0.9;">소스라이브 이용을 위한 계정이 준비되었습니다.</p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 40px 40px 10px 40px;">
+                        <p style="font-size: 15px; color: #333333; line-height: 1.7; margin: 0;">
+                          <span id="p-company-intro" class="var-fill">{회사명}</span> <span id="p-manager" class="var-fill">{담당자명}</span>님, 안녕하세요!<br>
+                          모비두 고객성공팀 솔루션파트입니다😊<br><br>
+                          웰컴 메일에서 작성해 주신 정보를 바탕으로<br>
+                          <span id="p-company-key" class="var-fill">{회사명}</span> 전용 <b>소스라이브 계정<span id="p-text-and-cert"> 및 인증키</span> 발급을 완료</b>하였습니다.<br><br>
+                          아래 정보를 확인하신 후, 소스라이브 서비스 이용을 시작해 주세요.
+                        </p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 10px 40px 20px 40px;">
+                        <h3 style="font-size: 18px; margin: 20px 0 15px 0; color: #111827; border-left: 4px solid #ff5f00; padding-left: 10px;">💌 소스라이브 계정 정보</h3>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #fef2eb; border-radius: 16px; padding: 25px; border: 1px solid #ff5f00;">
+                          <tr><td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr><td width="120" style="font-size: 14px; color: #ff5f00; font-weight: bold; padding-bottom: 12px;">파트너 아이디</td><td style="font-size: 15px; font-weight: bold; color: #111827; padding-bottom: 12px;"><span id="p-partner-id" class="var-fill">{파트너아이디}</span></td></tr>
+                                <tr><td style="font-size: 14px; color: #ff5f00; font-weight: bold; padding-bottom: 12px;">아이디</td><td style="font-size: 15px; font-weight: bold; color: #111827; padding-bottom: 12px;"><span id="p-account-id" class="var-fill">{계정아이디}</span></td></tr>
+                                <tr><td style="font-size: 14px; color: #ff5f00; font-weight: bold;">비밀번호</td><td style="font-size: 15px; font-weight: bold;"><span style="background-color: #000000; color: #000000; padding: 2px 8px; border-radius: 4px; font-family: inherit;"><span id="p-password" class="var-fill">{비밀번호}</span></span><span style="font-size: 12px; color: #ff3d33; font-weight: normal; margin-left: 10px;">(검은 영역 드래그하여 확인)</span></td></tr>
+                          </table></td></tr>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr><td align="center" style="padding: 10px 40px 30px 40px;"><table border="0" cellspacing="0" cellpadding="0" align="center"><tr><td align="center"><div style="border: 1px solid #eeeeee; border-radius: 12px; overflow: hidden; max-width: 340px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);"><img src="https://raw.githubusercontent.com/Koeun16/image/e4dd7d3e76f40a0b033f847355fe157327493475/admin.png" width="100%" style="display: block; border: none;"></div><p style="font-size: 12px; color: #999; margin-top: 10px;">[소스라이브 어드민 로그인 화면 예시]</p></td></tr></table></td></tr>
+
+                    <tr>
+                      <td style="padding: 0 40px 20px 40px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #e5e7eb; border-radius: 16px;">
+                          <tr><td style="padding: 30px; text-align: center;">
+                              <div style="font-size: 18px; font-weight: bold; color: #111827; margin-bottom: 10px;">💻 소스라이브 어드민 바로가기</div>
+                              <div style="font-size: 14px; color: #6b7280; line-height: 1.5; margin-bottom: 25px;">어드민 페이지에서 방송 편성 및 콘텐츠 관리를 시작해 보세요.</div>
+                              <div id="p-admin-prod"><table width="220" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto 8px auto;"><tr><td align="center" bgcolor="#ff5f00" style="border-radius: 10px; padding: 14px 0;"><a href="https://admin.sauce.im/" target="_blank" style="font-size: 14px; font-weight: bold; color: #ffffff; text-decoration: none; display: block; width: 100%;">운영 어드민 바로가기</a></td></tr></table><div style="font-size: 12px; color: #666; margin-bottom: 15px;">실제 방송 운영 및 콘텐츠 관리가 이루어지는 환경</div></div>
+                              <div id="p-admin-stage"><table width="220" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto 8px auto;"><tr><td align="center" bgcolor="#fee500" style="border-radius: 10px; padding: 14px 0;"><a href="https://stage.admin.sauce.im/" target="_blank" style="font-size: 14px; font-weight: bold; color: #3c1e1e; text-decoration: none; display: block; width: 100%;">스테이지 어드민 바로가기</a></td></tr></table><div style="font-size: 12px; color: #666;">개발 연동 테스트 및 사전 검증을 위한 테스트 환경</div></div>
+                          </td></tr>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr><td style="padding: 0 40px 40px 40px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #e5e7eb; border-radius: 16px;">
+                          <tr><td style="padding: 30px; text-align: center;">
+                            <div style="font-size: 18px; font-weight: bold; color: #111827; margin-bottom: 10px;">📚 소스라이브 가이드 확인하기</div>
+                            <div style="font-size: 14px; color: #6b7280; line-height: 1.5; margin-bottom: 25px;">소스라이브 이용 방법 및 설정 가이드를 확인해 보세요.</div>
+                            <table width="220" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto 12px auto;"><tr><td align="center" bgcolor="#000000" style="border-radius: 10px; padding: 14px 0;"><a href="https://docs.sauce.im/docs/live-intro" target="_blank" style="font-size: 14px; font-weight: bold; color: #ffffff; text-decoration: none; display: block; width: 100%;">운영 가이드 확인하기</a></td></tr></table>
+                            <div id="p-guide-builders"></div>
+                          </td></tr>
+                        </table>
+                    </td></tr>
+
+                    <tr id="p-section-pem">
+                      <td style="padding: 10px 40px 40px 40px; border-top: 1px solid #eeeeee;">
+                        <h3 style="font-size: 18px; margin: 30px 0 15px 0; color: #111827; border-left: 4px solid #ff5f00; padding-left: 10px;">🔐 서버별 인증키(PEM) 안내</h3>
+                        <p style="font-size: 13px; color: #666; margin-bottom: 25px;">안전한 서버 연동을 위해 인증키가 발급되었습니다.<br>메일에 첨부된 파일을 확인해 주세요.</p>
+                        <div id="p-pem-prod"><table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border: 1px solid #ff5f00; border-radius: 16px; margin-bottom: 20px; overflow: hidden;"><tr><td bgcolor="#ff5f00" style="padding: 8px 20px; color: #ffffff; font-size: 13px; font-weight: bold;">운영 서버 (Production)</td></tr><tr><td style="padding: 20px;"><table border="0" cellspacing="0" cellpadding="0"><tr><td style="padding-bottom: 12px;"><span style="display: inline-block; background-color: #fef2eb; color: #ff5f00; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; margin-right: 10px;">공개키</span><span style="font-size: 13px; color: #4b5563;">id_rsa_<span class="p-pem-partner-id">{파트너아이디}</span>_pub.cer</span></td></tr><tr><td><span style="display: inline-block; background-color: #fef2eb; color: #ff5f00; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; margin-right: 10px;">비공개</span><span style="font-size: 13px; color: #4b5563;">id_rsa_<span class="p-pem-partner-id">{파트너아이디}</span>_priv.cer</span></td></tr></table></td></tr></table></div>
+                        <div id="p-pem-stage"><table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border: 1px solid #fee500; border-radius: 16px; overflow: hidden;"><tr><td bgcolor="#fee500" style="padding: 8px 20px; color: #3c1e1e; font-size: 13px; font-weight: bold;">스테이지 서버 (Stage)</td></tr><tr><td style="padding: 20px;"><table border="0" cellspacing="0" cellpadding="0"><tr><td style="padding-bottom: 12px;"><span style="display: inline-block; background-color: #fffbeb; color: #b79b00; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; margin-right: 10px;">공개키</span><span style="font-size: 13px; color: #4b5563;">(stage) id_rsa_<span class="p-pem-partner-id">{파트너아이디}</span>_pub.cer</span></td></tr><tr><td><span style="display: inline-block; background-color: #fffbeb; color: #b79b00; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; margin-right: 10px;">비공개</span><span style="font-size: 13px; color: #4b5563;">(stage) id_rsa_<span class="p-pem-partner-id">{파트너아이디}</span>_priv.cer</span></td></tr></table></td></tr></table></div>
+                      </td>
+                    </tr>
+
+                    <tr><td style="padding: 0 40px;"><div style="border-top: 1px solid #eeeeee;"></div></td></tr>
+                    <tr><td style="padding: 40px 40px 20px 40px; text-align: center;"><p style="font-size: 16px; color: #111827; line-height: 1.7; margin: 0;">서비스 이용 중 궁금하신 점이 있으시면<br>언제든 편하게 연락 주세요.<br><br><span style="color: #ff5f00; font-weight: bold;"><span id="p-company-bottom" class="var-fill">{회사명}</span>의 성공적인 라이브 운영을 위해<br>끝까지 함께 하겠습니다. 🍀</span></p></td></tr>
+
+                    <tr><td style="padding: 30px 40px 60px 40px;"><table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #e5e7eb; border-radius: 16px;"><tr><td style="padding: 24px;"><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td valign="middle"><div style="font-size: 16px; font-weight: bold; color: #111827; margin-bottom: 6px;">💬 문의하기</div><div style="font-size: 13px; color: #6b7280;">궁금한 점은 카카오 채널 또는 메일로 문의해 주세요.</div></td><td width="180" valign="middle" align="right" style="padding-left: 15px;"><a href="https://pf.kakao.com/_CKxeSG" target="_blank" style="display: block; width: 100%; background-color: #fee500; color: #3c1e1e; text-decoration: none; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: bold; margin-bottom: 8px; text-align: center;">🔗 카카오 채널 문의</a><a href="mailto:csm_sol@mobidoo.co.kr" style="display: block; width: 100%; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: bold; text-align: center;">💌 메일 보내기</a></td></tr></table></td></tr></table></td></tr>
+                    <tr><td bgcolor="#f8f9fa" style="padding: 30px 40px; border-top: 1px solid #eeeeee; text-align: center;"><p style="font-size: 12px; color: #aaa; margin: 0;">Copyright © 2026 mobidoo. All Rights Reserved.</p></td></tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="panel-header">
+            <h2>Sauce CSM Mail Editor</h2>
+            <p>[소스라이브] ACCOUNT INFORMATION</p>
+        </div>
+        
+        <div class="panel-content">
+            <div class="section">
+                <span class="section-label">Email Title</span>
+                <div class="title-card">
+                    <div class="title-preview-text" id="title-preview">[소스라이브] 💌 {회사명}의 소스라이브 계정 정보를 안내드립니다</div>
+                    <button class="btn btn-dark" style="padding:10px; font-size:13px;" onclick="copyTitle()">제목 복사하기</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Common Variables</span>
+                <div class="input-group"><label>고객사명</label><input type="text" id="i-company" placeholder="회사명 입력" oninput="syncAll()"></div>
+                <div class="input-group"><label>담당자 이름</label><input type="text" id="i-manager" placeholder="이름 입력" oninput="syncAll()"></div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Account Details</span>
+                <div class="input-group"><label>파트너 아이디</label><input type="text" id="i-partner-id" placeholder="Partner ID 입력" oninput="syncAll()"></div>
+                <div class="input-group"><label>계정 아이디</label><input type="text" id="i-account-id" placeholder="Account ID 입력" oninput="syncAll()"></div>
+                <div class="input-group">
+                    <label>비밀번호</label>
+                    <div class="input-row">
+                        <input type="text" id="i-password" placeholder="비밀번호 입력" oninput="syncAll()">
+                        <button class="btn-gen" onclick="generatePw()">🎲 생성</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Visibility Options</span>
+                <label class="check-item"><input type="checkbox" id="check-admin-prod" checked onchange="syncAll()"> 운영 어드민 노출</label>
+                <label class="check-item"><input type="checkbox" id="check-admin-stage" checked onchange="syncAll()"> 스테이지 어드민 노출</label>
+                <label class="check-item"><input type="checkbox" id="check-pem-prod" checked onchange="syncAll()"> 운영 서버 인증키(PEM) 노출</label>
+                <label class="check-item"><input type="checkbox" id="check-pem-stage" checked onchange="syncAll()"> 스테이지 서버 인증키(PEM) 노출</label>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Builder Guides</span>
+                <div id="builder-checks">
+                    <label class="check-item"><input type="checkbox" value="cafe24" onchange="syncAll()"> 카페24</label>
+                    <label class="check-item"><input type="checkbox" value="makeshop" onchange="syncAll()"> 메이크샵</label>
+                    <label class="check-item"><input type="checkbox" value="godo" onchange="syncAll()"> 고도몰</label>
+                    <label class="check-item"><input type="checkbox" value="imweb" onchange="syncAll()"> 아임웹</label>
+                    <label class="check-item"><input type="checkbox" value="shopby" onchange="syncAll()"> 샵바이</label>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Actions</span>
+                <button class="btn btn-orange" onclick="copyMail()">메일 본문 복사하기</button>
+                <div class="help-text">가운데 정렬과 문의처 간격이 유지된 채로 복사됩니다.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">복사 완료!</div>
+
+    <script>
+        const builders = {
+            cafe24: { name: '카페24 가이드 확인하기', link: 'https://docs.sauce.im/docs/cafe24-saucelive-quickguide' },
+            makeshop: { name: '메이크샵 가이드 확인하기', link: 'https://docs.sauce.im/docs/makeshop-saucelive-quickguide' },
+            godo: { name: '고도몰 가이드 확인하기', link: 'https://docs.sauce.im/docs/godomall-saucelive-quickguide' },
+            imweb: { name: '아임웹 가이드 확인하기', link: 'https://docs.sauce.im/docs/imweb-saucelive-quickguide' },
+            shopby: { name: '샵바이 가이드 확인하기', link: 'https://docs.sauce.im/docs/shopby-saucelive-quickguide' }
+        };
+
+        function generatePw() {
+            const lower = "abcdefghijklmnopqrstuvwxyz";
+            const digits = "0123456789";
+            const specials = "!@#$%^&*";
+            const all = lower + digits + specials;
+            
+            // 길이 결정 (8~10)
+            const len = Math.floor(Math.random() * 3) + 8;
+            let pwd = "";
+            
+            // 필수 요소 각 1개씩 포함
+            pwd += lower[Math.floor(Math.random() * lower.length)];
+            pwd += digits[Math.floor(Math.random() * digits.length)];
+            pwd += specials[Math.floor(Math.random() * specials.length)];
+            
+            // 나머지 채우기
+            for (let i = pwd.length; i < len; i++) {
+                pwd += all[Math.floor(Math.random() * all.length)];
+            }
+            
+            // 무작위 셔플
+            pwd = pwd.split('').sort(() => 0.5 - Math.random()).join('');
+            
+            document.getElementById('i-password').value = pwd;
+            syncAll();
+        }
+
+        function syncAll() {
+            const company = document.getElementById('i-company').value || '{회사명}';
+            const manager = document.getElementById('i-manager').value || '{담당자명}';
+            const partnerId = document.getElementById('i-partner-id').value || '{파트너아이디}';
+            const accountId = document.getElementById('i-account-id').value || '{계정아이디}';
+            const password = document.getElementById('i-password').value || '{비밀번호}';
+
+            document.getElementById('p-company-intro').innerText = company;
+            document.getElementById('p-company-key').innerText = company;
+            document.getElementById('p-company-bottom').innerText = company;
+            document.getElementById('p-manager').innerText = manager;
+            document.getElementById('p-partner-id').innerText = partnerId;
+            document.getElementById('p-account-id').innerText = accountId;
+            document.getElementById('p-password').innerText = password;
+            document.querySelectorAll('.p-pem-partner-id').forEach(el => el.innerText = partnerId);
+
+            document.getElementById('title-preview').innerText = `[소스라이브] 💌 ${company}의 소스라이브 계정 정보를 안내드립니다`;
+
+            document.getElementById('p-admin-prod').style.display = document.getElementById('check-admin-prod').checked ? 'block' : 'none';
+            document.getElementById('p-admin-stage').style.display = document.getElementById('check-admin-stage').checked ? 'block' : 'none';
+
+            const prodPem = document.getElementById('check-pem-prod').checked;
+            const stagePem = document.getElementById('check-pem-stage').checked;
+            const hasPem = prodPem || stagePem;
+            document.getElementById('p-section-pem').style.display = hasPem ? 'table-row' : 'none';
+            document.getElementById('p-pem-prod').style.display = prodPem ? 'block' : 'none';
+            document.getElementById('p-pem-stage').style.display = stagePem ? 'block' : 'none';
+            document.getElementById('p-text-and-cert').innerText = hasPem ? ' 및 인증키' : '';
+
+            const guideContainer = document.getElementById('p-guide-builders');
+            guideContainer.innerHTML = '';
+            document.querySelectorAll('#builder-checks input:checked').forEach(chk => {
+                const b = builders[chk.value];
+                guideContainer.innerHTML += `<table width="220" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 8px auto 0 auto;"><tr><td align="center" bgcolor="#235BF5" style="border-radius: 10px; padding: 14px 0;"><a href="${b.link}" target="_blank" style="font-size: 14px; font-weight: bold; color: #ffffff; text-decoration: none; display: block; width: 100%;">${b.name}</a></td></tr></table>`;
+            });
+
+            toggleHighlight(document.getElementById('p-company-intro'), company === '{회사명}');
+            toggleHighlight(document.getElementById('p-manager'), manager === '{담당자명}');
+            toggleHighlight(document.getElementById('p-partner-id'), partnerId === '{파트너아이디}');
+            toggleHighlight(document.getElementById('p-account-id'), accountId === '{계정아이디}');
+            toggleHighlight(document.getElementById('p-password'), password === '{비밀번호}');
+            toggleHighlight(document.getElementById('p-company-bottom'), company === '{회사명}');
+        }
+
+        function toggleHighlight(el, isDimmed) { isDimmed ? el.classList.add('var-fill') : el.classList.remove('var-fill'); }
+        function copyTitle() { navigator.clipboard.writeText(document.getElementById('title-preview').innerText).then(() => showToast("제목 복사 완료!")); }
+
+        async function copyMail() {
+            const fills = document.querySelectorAll('.var-fill');
+            fills.forEach(f => f.style.backgroundColor = 'transparent');
+            const clone = document.getElementById('copy-target').cloneNode(true);
+            clone.querySelectorAll('[style*="display: none"]').forEach(el => el.remove());
+            try {
+                const blob = new Blob([clone.innerHTML], { type: 'text/html' });
+                await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]);
+                showToast("본문 복사 완료!");
+            } catch (err) { alert("복사 실패!"); }
+            fills.forEach(f => f.style.backgroundColor = '');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg; t.className = "show";
+            setTimeout(() => { t.className = ""; }, 2000);
+        }
+
+        window.onload = syncAll;
+    </script>
+</body>
+</html>

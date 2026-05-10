@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauce CSM Mail Editor - Onboarding</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --sauce-orange: #ff5f00;
+            --sauce-orange-hover: #e65600;
+            --sauce-black: #00020f;
+            --bg-workspace: #f3f4f6;
+            --panel-bg: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --border-color: #e5e7eb;
+            --btn-dark: #374151;
+            --btn-dark-hover: #111827;
+        }
+
+        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: var(--bg-workspace); display: flex; height: 100vh; overflow: hidden; color: var(--text-main); }
+
+        /* [좌측] 미리보기 영역 */
+        .preview-area { flex: 1; padding: 40px; overflow-y: auto; display: flex; justify-content: center; scroll-behavior: smooth; }
+
+        /* [우측] 제어 패널 */
+        .control-panel { width: 420px; background-color: var(--panel-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.03); }
+        .panel-header { padding: 30px 25px; background-color: var(--sauce-black); color: #ffffff; }
+        .panel-header h2 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--sauce-orange); }
+        .panel-header p { margin: 8px 0 0 0; font-size: 13px; opacity: 0.6; font-weight: 500; }
+        .panel-content { padding: 30px 25px; flex: 1; overflow-y: auto; }
+
+        .section { margin-bottom: 35px; }
+        .section-label { font-size: 12px; font-weight: 800; color: var(--sauce-orange); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 1px; }
+
+        .title-card { background-color: #f9fafb; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .title-preview-text { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.5; margin-bottom: 15px; word-break: break-all; }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .input-group input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; font-family: inherit; }
+        .input-group input:focus { border-color: var(--sauce-orange); outline: none; box-shadow: 0 0 0 4px rgba(255, 95, 0, 0.1); }
+
+        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .check-item input { width: 18px; height: 18px; accent-color: var(--sauce-orange); cursor: pointer; }
+
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s; }
+        .btn-orange { background-color: var(--sauce-orange); color: white; margin-bottom: 12px; }
+        .btn-orange:hover { background-color: var(--sauce-orange-hover); transform: translateY(-1px); }
+        .btn-dark { background-color: var(--btn-dark); color: white; padding: 10px; font-size: 13px; }
+
+        .help-text { font-size: 12px; color: var(--text-sub); text-align: center; margin-top: 15px; line-height: 1.6; }
+        #toast { visibility: hidden; min-width: 220px; background-color: var(--sauce-black); color: #fff; text-align: center; border-radius: 50px; padding: 14px 24px; position: fixed; z-index: 2000; left: 50%; bottom: 40px; transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2s; }
+
+        .var-fill { background-color: #fff9c4; color: #d84315; font-weight: bold; border-radius: 2px; padding: 0 2px; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 40px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 40px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <div class="preview-area">
+        <div id="copy-target">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4" style="font-family: 'Pretendard', sans-serif;">
+              <tr>
+                <td align="center" style="padding: 40px 0;">
+                  <table width="600" border="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff" style="border: 1px solid #eeeeee; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                    
+                    <tr>
+                      <td bgcolor="#235BF5" style="padding: 50px 40px; text-align: center; background: linear-gradient(135deg, #235BF5 0%, #153fb3 100%);">
+                        <div style="display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; color: #ffffff; font-size: 13px; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;">ONBOARDING INVITATION</div>
+                        <h1 style="font-size: 35px; color: #ffffff; margin: 0; letter-spacing: -1px; font-weight: 800;">소스라이브 온보딩 일정 안내 🗓️</h1>
+                        <p style="font-size: 18px; color: #ffffff; margin-top: 12px; line-height: 1.5; opacity: 0.9;">성공적인 첫 방송 준비를 위한 온보딩 일정이 확정되었습니다.</p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 40px 40px 10px 40px;">
+                        <p style="font-size: 15px; color: #333333; line-height: 1.7; margin: 0;">
+                          <span id="p-company-intro" class="var-fill">{회사명}</span> <span id="p-manager" class="var-fill">{담당자명}</span>님, 안녕하세요!<br>
+                          모비두 고객성공팀 솔루션파트입니다😊<br><br>
+                          소스라이브의 원활한 이용과 성공적인 첫 방송 준비를 위해<br>
+                          <b>온보딩 일정을 확정</b>하여 안내드립니다.<br><br>
+                          아래 내용을 확인하시고, 해당 일정에 맞춰 참석 부탁드립니다.
+                        </p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 20px 30px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#f8f9fa; border-radius:12px; padding:25px 10px;">
+                          <tbody><tr><td align="center"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; border:1px solid #ddd; color:#999; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">1</div><div style="font-size:13px; color:#999;">계정 발급</div></td>
+                            <td width="30" style="padding-bottom:25px; color:#cccccc; text-align:center; font-size: 16px; font-weight: bold;">&gt;</td>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; background-color:#235BF5; color:#ffffff; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">2</div><div style="font-size:13px; font-weight:bold; color:#235BF5;">온보딩</div></td>
+                            <td width="30" style="padding-bottom:25px; color:#cccccc; text-align:center; font-size: 16px; font-weight: bold;">&gt;</td>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; border:1px solid #ddd; color:#999; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">3</div><div style="font-size:13px; color:#999;">정합 및 테스트</div></td>
+                            <td width="30" style="padding-bottom:25px; color:#cccccc; text-align:center; font-size: 16px; font-weight: bold;">&gt;</td>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; border:1px solid #ddd; color:#999; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">4</div><div style="font-size:13px; color:#999;">첫 방송</div></td>
+                          </tr></tbody></table></td></tr></tbody>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 20px 40px;">
+                        <h3 style="font-size: 18px; margin: 0 0 20px 0; color: #111827; line-height: 1.2;">
+                            <span style="background: #235BF5; width: 4px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 10px;"></span>
+                            <span style="vertical-align: middle;"><span style="margin-right: 8px;">🗓️</span>온보딩 일정 및 참여 안내</span>
+                        </h3>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-radius: 16px; overflow: hidden; border: 2px solid #235BF5;">
+                          <tr>
+                            <td bgcolor="#f8faff" style="padding: 30px; border-bottom: 2px dashed #235BF5;">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td width="70" valign="top">
+                                            <div style="background-color: #235BF5; color: #ffffff; text-align: center; border-radius: 10px; padding: 10px 0; font-weight: 800;">
+                                                <div id="p-date-month" style="font-size: 12px; opacity: 0.8;">FEB</div>
+                                                <div id="p-date-day" style="font-size: 24px;">09</div>
+                                            </div>
+                                        </td>
+                                        <td style="padding-left: 20px;">
+                                            <div style="font-size: 14px; color: #235BF5; font-weight: bold; margin-bottom: 5px;">TIME & PLACE</div>
+                                            <div id="p-date-full" style="font-size: 18px; font-weight: 800; color: #111827;"><span class="var-fill">2026년 2월 9일 (수) 17:30</span></div>
+                                            <div id="p-place-name" style="font-size: 14px; color: #666; margin-top: 3px;">Google Meet (온라인 화상 회의)</div>
+                                            <div id="p-mobidoo-addr" style="font-size: 13px; color: #475569; margin-top: 6px; display: none; line-height: 1.4;">주소 : 서울특별시 송파구 올림픽로35다길 42, 한국루터회관 20층</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td bgcolor="#ffffff" style="padding: 20px 30px; text-align: center;">
+                                <a id="p-meeting-link" href="#" target="_blank" style="font-size: 15px; font-weight: bold; color: #235BF5; text-decoration: none;">🎟️ 온보딩 참여 링크 바로가기 ></a>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 20px 45px 40px 45px;">
+                        <h3 style="font-size: 18px; margin: 0 0 20px 0; color: #111827; line-height: 1.2;">
+                            <span style="background: #235BF5; width: 4px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 10px;"></span>
+                            <span style="vertical-align: middle;"><span style="margin-right: 8px;">🔑</span>온보딩 전용 계정 안내</span>
+                        </h3>
+                        <div style="background-color: #1e293b; border-radius: 16px; padding: 30px; position: relative; overflow: hidden;">
+                            <div style="margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
+                                <span style="display: inline-block; width: 10px; height: 10px; background: #ff5f56; border-radius: 50%; margin-right: 5px;"></span>
+                                <span style="display: inline-block; width: 10px; height: 10px; background: #ffbd2e; border-radius: 50%; margin-right: 5px;"></span>
+                                <span style="display: inline-block; width: 10px; height: 10px; background: #27c93f; border-radius: 50%;"></span>
+                            </div>
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr><td width="115" style="font-size: 13px; color: #94a3b8; padding-bottom: 12px; font-family: monospace;">파트너 아이디</td><td style="font-size: 15px; font-weight: bold; color: #ffffff; padding-bottom: 12px;">onboard</td></tr>
+                                <tr><td width="115" style="font-size: 13px; color: #94a3b8; padding-bottom: 12px; font-family: monospace;">아이디</td><td style="font-size: 15px; font-weight: bold; color: #ffffff; padding-bottom: 12px;"><span id="p-account-id" class="var-fill">{온보딩아이디}</span></td></tr>
+                                <tr><td width="115" style="font-size: 13px; color: #94a3b8; padding-bottom: 25px; font-family: monospace;">비밀번호</td><td style="font-size: 15px; font-weight: bold; padding-bottom: 25px;"><span style="background-color: #ffffff; color: #ffffff; padding: 2px 8px; border-radius: 4px;"><span id="p-password" class="var-fill">{비밀번호}</span></span><span style="font-size: 11px; color: #38bdf8; font-weight: normal; margin-left: 10px;">&larr; 드래그하여 확인</span></td></tr>
+                                <tr><td colspan="2" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px;"><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td align="center" bgcolor="#235BF5" style="border-radius: 12px; padding: 14px 0;"><a href="https://admin.sauce.im/" target="_blank" style="font-size: 15px; font-weight: bold; color: #ffffff; text-decoration: none; display: block; width: 100%;">🚀 온보딩 전용 계정 로그인 바로가기</a></td></tr></table></td></tr>
+                            </table>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 0 45px 50px 45px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; border-radius: 20px;">
+                          <tr><td style="padding: 40px 30px; text-align: center;">
+                              <div style="font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 12px;">📝 맞춤형 온보딩을 위한 사전 설문</div>
+                              <p style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 25px 0;">소스라이브 기능 중 더 자세히 알고 싶은 부분이 있으신가요?<br>궁금한 내용을 설문으로 남겨주시면,<br>해당 내용을 중심으로 맞춤형 온보딩을 준비하겠습니다.</p>
+                              <table width="240" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
+                                <tr><td align="center" bgcolor="#0D9488" style="border-radius: 30px; padding: 16px 0; box-shadow: 0 4px 10px rgba(13, 148, 136, 0.2);"><a href="https://tally.so/r/jaQxvJ" target="_blank" style="font-size: 15px; font-weight: bold; color: #ffffff; text-decoration: none; display: block; width: 100%;">👉 사전 설문 참여하기</a></td></tr>
+                              </table>
+                          </td></tr>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr><td style="padding: 0 40px;"><div style="border-top: 1px solid #eeeeee;"></div></td></tr>
+                    <tr><td style="padding: 40px 40px 20px 40px; text-align: center;"><p style="font-size: 16px; color: #111827; line-height: 1.7; margin: 0;">온보딩에서 <span id="p-company-bottom" class="var-fill">{회사명}</span>의 운영 목적과 환경에 맞춘<br>실질적인 활용 방법을 함께 안내드리겠습니다.<br><br>일정 관련 문의가 있으시면 언제든 편하게 연락 주세요.<br>온보딩에서 뵙겠습니다 😊</p></td></tr>
+
+                    <tr><td style="padding: 30px 40px 60px 40px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #e5e7eb; border-radius: 16px;">
+                          <tr><td style="padding: 24px;"><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td valign="middle"><div style="font-size: 16px; font-weight: bold; color: #111827; margin-bottom: 6px;">💬 문의하기</div><div style="font-size: 13px; color: #6b7280; line-height: 1.5;">궁금한 점은 카카오 채널 또는 메일로 문의해 주세요.</div></td><td width="180" valign="middle" align="right" style="padding-left: 15px;"><a href="https://pf.kakao.com/_CKxeSG" target="_blank" style="display: block; width: 100%; background-color: #fee500; color: #3c1e1e; text-decoration: none; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: bold; margin-bottom: 8px; text-align: center;">🔗 카카오 채널 문의</a><a href="mailto:csm_sol@mobidoo.co.kr" style="display: block; width: 100%; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: bold; text-align: center;">💌 메일 보내기</a></td></tr></table></td></tr>
+                        </table>
+                    </td></tr>
+                    <tr><td bgcolor="#f8f9fa" style="padding: 30px 40px; border-top: 1px solid #eeeeee; text-align: center;"><p style="font-size: 12px; color: #aaa; margin: 0;">Copyright © 2026 mobidoo. All Rights Reserved.</p></td></tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="panel-header">
+            <h2>Sauce CSM Mail Editor</h2>
+            <p>[소스라이브] ONBOARDING INVITATION</p>
+        </div>
+        
+        <div class="panel-content">
+            <div class="section">
+                <span class="section-label">Email Title</span>
+                <div class="title-card">
+                    <div class="title-preview-text" id="title-preview">[소스라이브] 🗓️ {회사명}의 온보딩 일정이 확정되었습니다.</div>
+                    <button class="btn btn-dark" style="padding:10px; font-size:13px;" onclick="copyTitle()">제목 복사하기</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Common Variables</span>
+                <div class="input-group"><label>고객사명</label><input type="text" id="i-company" placeholder="회사명 입력" oninput="sync()"></div>
+                <div class="input-group"><label>담당자 이름</label><input type="text" id="i-manager" placeholder="이름 입력" oninput="sync()"></div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Meeting Settings</span>
+                <div class="input-group">
+                    <label>미팅 방식 선택</label>
+                    <label class="check-item"><input type="radio" name="m-type" value="online" checked onchange="sync()"> 온라인 화상 미팅</label>
+                    <label class="check-item"><input type="radio" name="m-type" value="client" onchange="sync()"> 고객사 방문 미팅</label>
+                    <label class="check-item"><input type="radio" name="m-type" value="mobidoo" onchange="sync()"> 모비두 방문 미팅</label>
+                </div>
+                <div class="input-group"><label>일자 선택</label><input type="date" id="i-date" oninput="sync()"></div>
+                <div class="input-group"><label>시간 입력</label><input type="time" id="i-time" oninput="sync()"></div>
+                <div id="url-wrap" class="input-group"><label id="url-label">참여/장소 링크</label><input type="text" id="i-url" placeholder="https://..." oninput="sync()"></div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Account Details</span>
+                <div class="input-group"><label>온보딩용 계정 ID</label><input type="text" id="i-account-id" placeholder="ID 입력" oninput="sync()"></div>
+                <div class="input-group"><label>비밀번호 (난수 생성 제외)</label><input type="text" id="i-password" placeholder="비밀번호 입력" oninput="sync()"></div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Actions</span>
+                <button class="btn btn-orange" onclick="copyMail()">메일 본문 복사하기</button>
+                <div class="help-text">선택한 미팅 방식에 따라 주소 및 링크가 자동 전환됩니다.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">복사 완료!</div>
+
+    <script>
+        function sync() {
+            const company = document.getElementById('i-company').value || '{회사명}';
+            const manager = document.getElementById('i-manager').value || '{담당자명}';
+            const dateVal = document.getElementById('i-date').value;
+            const timeVal = document.getElementById('i-time').value || '00:00';
+            const accountId = document.getElementById('i-account-id').value || '{온보딩아이디}';
+            const password = document.getElementById('i-password').value || '{비밀번호}';
+            const meetingType = document.querySelector('input[name="m-type"]:checked').value;
+            
+            document.getElementById('p-company-intro').innerText = company;
+            document.getElementById('p-company-bottom').innerText = company;
+            document.getElementById('p-manager').innerText = manager;
+            document.getElementById('p-account-id').innerText = accountId;
+            document.getElementById('p-password').innerText = password;
+            document.getElementById('title-preview').innerText = `[소스라이브] 🗓️ ${company}의 온보딩 일정이 확정되었습니다.`;
+
+            // Meeting Logic
+            const pPlace = document.getElementById('p-place-name');
+            const pLink = document.getElementById('p-meeting-link');
+            const pAddr = document.getElementById('p-mobidoo-addr');
+            const iUrlWrap = document.getElementById('url-wrap');
+            const iUrl = document.getElementById('i-url');
+
+            if(meetingType === 'online') {
+                pPlace.innerText = "Google Meet (온라인 화상 회의)";
+                pLink.innerText = "🎟️ 온보딩 참여 링크 바로가기 >";
+                pLink.href = iUrl.value || "#";
+                pAddr.style.display = 'none';
+                iUrlWrap.style.display = 'block';
+                document.getElementById('url-label').innerText = "Google Meet 링크";
+            } else if(meetingType === 'client') {
+                pPlace.innerText = "고객사 방문 오프라인 미팅";
+                pLink.innerText = "📍 온보딩 진행 장소 확인하기 >";
+                pLink.href = iUrl.value || "#";
+                pAddr.style.display = 'none';
+                iUrlWrap.style.display = 'block';
+                document.getElementById('url-label').innerText = "장소 확인 링크(지도 등)";
+            } else {
+                pPlace.innerText = "모비두 방문 오프라인 미팅";
+                pLink.innerText = "🏢 모비두 위치 확인하기 >";
+                pLink.href = "https://naver.me/FUiztytz";
+                pAddr.style.display = 'block'; // 주소 노출
+                iUrlWrap.style.display = 'none'; // 링크 입력창 숨김
+            }
+
+            // Date Logic
+            if(dateVal) {
+                const d = new Date(dateVal);
+                const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+                const days = ["일", "월", "화", "수", "목", "금", "토"];
+                document.getElementById('p-date-month').innerText = months[d.getMonth()];
+                document.getElementById('p-date-day').innerText = String(d.getDate()).padStart(2, '0');
+                document.getElementById('p-date-full').innerText = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]}) ${timeVal}`;
+                document.getElementById('p-date-full').classList.remove('var-fill');
+            }
+
+            toggleHighlight(document.getElementById('p-company-intro'), company === '{회사명}');
+            toggleHighlight(document.getElementById('p-company-bottom'), company === '{회사명}');
+            toggleHighlight(document.getElementById('p-manager'), manager === '{담당자명}');
+            toggleHighlight(document.getElementById('p-account-id'), accountId === '{온보딩아이디}');
+            toggleHighlight(document.getElementById('p-password'), password === '{비밀번호}');
+        }
+
+        function toggleHighlight(el, isDimmed) { isDimmed ? el.classList.add('var-fill') : el.classList.remove('var-fill'); }
+        function copyTitle() { navigator.clipboard.writeText(document.getElementById('title-preview').innerText).then(() => showToast("제목 복사 완료!")); }
+        
+        async function copyMail() {
+            const fills = document.querySelectorAll('.var-fill');
+            fills.forEach(f => f.style.backgroundColor = 'transparent');
+            const clone = document.getElementById('copy-target').cloneNode(true);
+            clone.querySelectorAll('[style*="display: none"]').forEach(el => el.remove());
+            try {
+                const blob = new Blob([clone.innerHTML], { type: 'text/html' });
+                await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]);
+                showToast("본문 복사 완료!");
+            } catch (err) { alert("복사 실패!"); }
+            fills.forEach(f => f.style.backgroundColor = '');
+        }
+
+        function showToast(msg) { const t = document.getElementById("toast"); t.innerText = msg; t.className = "show"; setTimeout(() => { t.className = ""; }, 2000); }
+        window.onload = sync;
+    </script>
+</body>
+</html>
