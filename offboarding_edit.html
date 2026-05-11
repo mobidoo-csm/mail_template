@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauce CSM Mail Editor - Off-boarding</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --sauce-orange: #ff5f00;
+            --sauce-orange-hover: #e65600;
+            --sauce-black: #00020f;
+            --bg-workspace: #f3f4f6;
+            --panel-bg: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --border-color: #e5e7eb;
+            --btn-dark: #374151;
+            --btn-dark-hover: #111827;
+        }
+
+        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: var(--bg-workspace); display: flex; height: 100vh; overflow: hidden; color: var(--text-main); }
+
+        /* [좌측] 미리보기 영역 */
+        .preview-area { flex: 1; padding: 40px; overflow-y: auto; display: flex; justify-content: center; scroll-behavior: smooth; }
+
+        /* [우측] 제어 패널 */
+        .control-panel { width: 420px; background-color: var(--panel-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.03); }
+        .panel-header { padding: 30px 25px; background-color: var(--sauce-black); color: #ffffff; }
+        .panel-header h2 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--sauce-orange); }
+        .panel-header p { margin: 8px 0 0 0; font-size: 13px; opacity: 0.6; font-weight: 500; }
+        .panel-content { padding: 30px 25px; flex: 1; overflow-y: auto; }
+
+        .section { margin-bottom: 35px; }
+        .section-label { font-size: 12px; font-weight: 800; color: var(--sauce-orange); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 1px; }
+
+        .title-card { background-color: #f9fafb; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .title-preview-text { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.5; margin-bottom: 15px; word-break: break-all; }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .input-group input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; font-family: inherit; }
+        .input-group input:focus { border-color: var(--sauce-orange); outline: none; box-shadow: 0 0 0 4px rgba(255, 95, 0, 0.1); }
+
+        /* 체크박스 & 스위치 스타일 */
+        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .check-item input { width: 18px; height: 18px; accent-color: var(--sauce-orange); cursor: pointer; }
+
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s; }
+        .btn-orange { background-color: var(--sauce-orange); color: white; margin-bottom: 12px; }
+        .btn-orange:hover { background-color: var(--sauce-orange-hover); transform: translateY(-1px); }
+        .btn-dark { background-color: var(--btn-dark); color: white; padding: 10px; font-size: 13px; }
+
+        .help-text { font-size: 12px; color: var(--text-sub); text-align: center; margin-top: 15px; line-height: 1.6; }
+        #toast { visibility: hidden; min-width: 220px; background-color: var(--sauce-black); color: #fff; text-align: center; border-radius: 50px; padding: 14px 24px; position: fixed; z-index: 2000; left: 50%; bottom: 40px; transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2s; }
+
+        .var-fill { background-color: #fff9c4; color: #d84315; font-weight: bold; border-radius: 2px; padding: 0 2px; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 40px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 40px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <div class="preview-area">
+        <div id="copy-target">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4" style="font-family: 'Pretendard', sans-serif;">
+              <tr>
+                <td align="center" style="padding: 40px 0;">
+                  <table width="600" border="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff" style="border: 1px solid #eeeeee; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                    
+                    <tr>
+                      <td bgcolor="#FF5F00" style="padding: 50px 40px; text-align: center; background: linear-gradient(135deg, #FF5F00 0%, #ff8a3d 100%);">
+                        <div style="display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; color: #ffffff; font-size: 13px; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;">OFF-BOARDING MAIL</div>
+                        <h1 style="font-size: 32px; color: #ffffff; margin: 0; letter-spacing: -1px; font-weight: 800;">서비스 종료 및 오프보딩 안내 👋</h1>
+                        <p style="font-size: 17px; color: #ffffff; margin-top: 12px; line-height: 1.5; opacity: 0.9;">서비스 종료 일정과 백업 절차를 안내드립니다.</p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 40px 40px 10px 40px;">
+                        <p style="font-size: 15px; color: #333333; line-height: 1.7; margin: 0;">
+                          <span id="p-company-intro" class="var-fill">{회사명}</span> <span id="p-manager" class="var-fill">{담당자명}</span>님, 안녕하세요!<br>
+                          모비두 고객성공팀 솔루션파트입니다 😊<br><br>
+                          <b>그동안 모비두와 함께해 주셔서 진심으로 감사드립니다.</b><br><br>
+                          요청 주신 일정에 따라 <b><span id="p-intro-date" class="var-fill">{연도}년 {월}월 {일}</span>부로 서비스가 종료될 예정</b>입니다.<br>
+                          원활한 오프보딩을 위해 서비스 종료 일정과 백업 관련 안내 사항을 전달드립니다.
+                        </p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 45px 36px 15px 36px;">
+                        <div style="font-size:18px; font-weight:800; color:#111827; margin-bottom:18px;">
+                            <span style="background: #FF5F00; width: 4px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 10px; border-radius: 2px;"></span>
+                            <span style="vertical-align: middle;">📅 서비스 종료 일정 안내</span>
+                        </div>
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fff9f5; border-radius:16px;">
+                          <tr>
+                            <td width="50%" style="padding: 25px 20px; text-align: center; border-right: 1px solid #f8dcc4;">
+                                <div style="font-size: 13px; color: #fd7e14; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">계약 종료일</div>
+                                <div id="p-contract-end" style="font-size: 18px; color: #374151; font-weight: 800;" class="var-fill">2025. 12. 31</div>
+                            </td>
+                            <td width="50%" style="padding: 25px 20px; text-align: center;">
+                                <div style="font-size: 13px; color: #fd7e14; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">서비스 종료일</div>
+                                <div id="p-service-end" style="font-size: 18px; color: #FF5F00; font-weight: 800;" class="var-fill">2026. 02. 28</div>
+                            </td>
+                          </tr>
+                        </table>
+                        <p style="margin:12px 0 0 4px; font-size:12px; line-height:1.6; color:#6b7280;">
+                          <span style="color: #ef4444; font-weight: 600;">※ 서비스 종료일 이후에는 이용 중인 서비스 및 관련 API 접근이 제한될 수 있습니다.</span>
+                        </p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 45px 36px 15px 36px;">
+                        <div style="font-size:18px; font-weight:800; color:#111827; margin-bottom:18px;">
+                          <span style="background: #FF5F00; width: 4px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 10px; border-radius: 2px;"></span>
+                          <span style="vertical-align: middle;">📦 서비스별 Off-boarding 안내</span>
+                        </div>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #fffaf5; border: 1px dashed #FF5F00; border-radius: 12px;">
+                          <tr>
+                            <td style="padding: 20px;">
+                              <div style="font-size: 15px; line-height: 1.8; color: #4b5563;">
+                                ⭐ <span style="background-color: #FF5F00; color: #ffffff; font-weight: 800; font-size: 15px; padding: 3px 8px; border-radius: 4px;">백업이 필요한 데이터 항목, 희망 백업 방법 및 대상 기간을 회신해 주세요.</span><br>
+                                <span style="color: #FF5F00; font-weight: 800; font-size: 16px; display: inline-block; margin-top: 6px;">📅 회신 기한 : <span id="p-deadline" class="var-fill">{yyyy.mm.dd}</span> 까지</span>
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                        <div style="margin: 10px 0 25px 4px; font-size: 13px; color: #6b7280; line-height: 1.6;">
+                            ※ 기한 내 회신이 없을 경우, 내부 정책에 따라 데이터 보관 및 백업 지원이 제한될 수 있습니다.<br>※ 백업 방식은 데이터 항목 및 용량에 따라 별도 안내드릴 수 있습니다.
+                        </div>
+
+                        <div id="p-block-live">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb; border-radius:14px; overflow:hidden; margin-bottom:18px;">
+                              <tr><td style="background-color:#fff5ec; padding:18px 20px; border-bottom:1px solid #f8dcc4;"><div style="font-size: 18px; font-weight: 900; color: #FF5F00; letter-spacing: -0.5px; display: flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="18" height="18" style="margin-right: 8px; vertical-align: middle;"><path fill="#FF5F00" d="M0 128C0 92.7 28.7 64 64 64H320c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zM559.1 99.8c10.4 5.6 16.9 16.4 16.9 28.2V384c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64L416 337.1V174.9l14.2-9.5 96-64c9.9-6.6 22.6-7.1 32.9-1.6z"></path></svg><span style="vertical-align: middle;">소스라이브</span></div></td></tr>
+                              <tr><td style="padding:20px; background-color:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="95" valign="top" style="padding-bottom:14px;"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">백업 데이터</div></td><td style="padding:0 0 14px 12px; font-size:14px; line-height:1.6; color:#374151; font-weight:600;">라이브 영상 및 채팅 데이터</td></tr><tr><td width="95" valign="top" style="padding-bottom:14px;"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">백업 방법</div></td><td style="padding:0 0 14px 12px; font-size:14px; line-height:1.6; color:#374151;">데이터 용량에 따라 SFTP 전달 또는 직접 다운로드</td></tr><tr><td width="95" valign="top"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">백업 기간</div></td><td style="padding:0 0 0 12px; font-size:14px; line-height:1.6; color:#374151;">백업이 필요한 방송 기간 회신 요청 <span style="background-color: #ef4444; color: #ffffff; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: 4px; font-weight: 800; vertical-align: middle;">*전체 기간 설정 가능</span></td></tr><tr><td colspan="2" style="padding-top:15px; font-size:12px; color:#ef4444; font-weight:600;">※ 영상 수가 많지 않은 경우 직접 다운로드를 권장드리며, 데이터가 많은 경우 SFTP로 제공됩니다.</td></tr></table></td></tr>
+                            </table>
+                        </div>
+
+                        <div id="p-block-clip">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb; border-radius:14px; overflow:hidden; margin-bottom:18px;">
+                              <tr><td style="background-color:#fefce8; padding:18px 20px; border-bottom:1px solid #fef08a;"><div style="font-size: 18px; font-weight: 900; color: #ca8a04; letter-spacing: -0.5px; display: flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="18" height="18" style="margin-right: 8px; vertical-align: middle;"><path fill="#ca8a04" d="M448 96c0-35.3-28.7-64-64-64H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V96zM320 160H192L256 32h128L320 160zM128 32l64 128H64c-17.7 0-32-14.3-32-32V96c0-17.7 14.3-32 32-32H128zM32 416V192H480V416c0 17.7-14.3 32-32 32H64c-17.7 0-32-14.3-32-32z"></path></svg><span style="vertical-align: middle;">소스클립</span></div></td></tr>
+                              <tr><td style="padding:20px; background-color:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="95" valign="top" style="padding-bottom:14px;"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">백업 데이터</div></td><td style="padding:0 0 14px 12px; font-size:14px; line-height:1.6; color:#374151; font-weight:600;">클립 영상 데이터</td></tr><tr><td width="95" valign="top" style="padding-bottom:14px;"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">백업 방법</div></td><td style="padding:0 0 14px 12px; font-size:14px; line-height:1.6; color:#374151;">SFTP 전달</td></tr><tr><td width="95" valign="top"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">백업 기간</div></td><td style="padding:0 0 0 12px; font-size:14px; line-height:1.6; color:#374151;">백업이 필요한 업로드 기간 회신 요청 <span style="background-color: #ef4444; color: #ffffff; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: 4px; font-weight: 800; vertical-align: middle;">*전체 기간 설정 가능</span></td></tr></table></td></tr>
+                            </table>
+                        </div>
+
+                        <div id="p-block-link">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb; border-radius:14px; overflow:hidden;">
+                              <tr><td style="background-color:#f0fdf4; padding:18px 20px; border-bottom:1px solid #bbf7d0;"><div style="font-size: 18px; font-weight: 900; color: #16a34a; letter-spacing: -0.5px; display: flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="18" height="18" style="margin-right: 8px; vertical-align: middle;"><path fill="#16a34a" d="M579.8 267.7c56.5-56.5 56.5-148 0-204.5c-50-50-128.8-56.5-186.3-15.4l-1.6 1.1c-14.4 10.3-17.7 30.3-7.4 44.6s30.3 17.7 44.6 7.4l1.6-1.1c32.1-22.9 76-19.3 103.8 8.6c31.5 31.5 31.5 82.5 0 114L422.3 334.8c-31.5 31.5-82.5 31.5-114 0c-27.9-27.9-31.5-71.8-8.6-103.8l1.1-1.6c10.3-14.4 6.9-34.4-7.4-44.6s-34.4-6.9-44.6 7.4l-1.1 1.6C206.5 251.2 213 330 263 380c56.5 56.5 148 56.5 204.5 0L579.8 267.7zM60.2 244.3c-56.5 56.5-56.5 148 0 204.5c50 50 128.8 56.5 186.3 15.4l1.6-1.1c14.4-10.3 17.7-30.3 7.4-44.6s-30.3-17.7-44.6-7.4l-1.6 1.1c-32.1 22.9-76 19.3-103.8-8.6C74 372 74 321 105.5 289.5L217.7 177.2c31.5-31.5 82.5-31.5 114 0c27.9 27.9 31.5 71.8 8.6 103.8l-1.1 1.6c-10.3 14.4-6.9-34.4-7.4-44.6s-34.4-6.9-44.6 7.4l-1.1 1.6C433.5 260.8 427 182 377 132c-56.5-56.5-148-56.5-204.5 0L60.2 244.3z"></path></svg><span style="vertical-align: middle;">소스링크</span></div></td></tr>
+                              <tr><td style="padding:20px; background-color:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="95" valign="top" style="padding-bottom:14px;"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">백업 데이터</div></td><td style="padding:0 0 14px 12px; font-size:14px; line-height:1.6; color:#374151; font-weight:600;">추후 입력</td></tr><tr><td width="95" valign="top" style="padding-bottom:14px;"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">백업 방법</div></td><td style="padding:0 0 14px 12px; font-size:14px; line-height:1.6; color:#374151;">추후 입력</td></tr><tr><td width="95" valign="top"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">백업 기간</div></td><td style="padding:0 0 0 12px; font-size:14px; line-height:1.6; color:#374151;">백업이 필요한 데이터 기간 회신 요청 <span style="background-color: #ef4444; color: #ffffff; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: 4px; font-weight: 800; vertical-align: middle;">*전체 기간 설정 가능</span></td></tr></table></td></tr>
+                            </table>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 45px 36px 40px 36px;">
+                        <div style="font-size:18px; font-weight:800; color:#111827; margin-bottom:14px;">
+                          <span style="background: #FF5F00; width: 4px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 10px; border-radius: 2px;"></span>
+                          <span style="vertical-align: middle;">📌 추가 안내 및 요청 사항</span>
+                        </div>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #FF5F00; border-radius: 10px; margin-bottom: 10px; background-color: #fff5ec;">
+                            <tr>
+                                <td width="32" valign="top" style="padding: 16px 0 16px 16px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle;"><path fill="#FF5F00" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"></path></svg></td>
+                                <td style="padding: 16px 16px 16px 1px; font-size: 14px; color: #475569; line-height: 1.6;"><span style="background-color: #ef4444; color: #ffffff; font-weight: 800; font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-right: 4px; vertical-align: baseline;">중요</span>서비스 종료일 이후에는 <b style="color: #ef4444;">모비두 솔루션과 연동된 앱, 스크립트, SDK, API 호출 로직 등을 삭제 또는 비활성화 처리</b>해 주시기를 부탁드립니다.</td>
+                            </tr>
+                        </table>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 10px; background-color: #f8fafc;">
+                            <tr>
+                                <td width="32" valign="top" style="padding: 16px 0 16px 16px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle;"><path fill="#FF5F00" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"></path></svg></td>
+                                <td style="padding: 16px 16px 16px 1px; font-size: 14px; color: #475569; line-height: 1.6;">미처 전달되지 않은 항목이나 별도 요청 사항이 있으시다면 편하게 말씀해 주세요.</td>
+                            </tr>
+                        </table>
+                        <div id="p-exposure-block">
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #e2e8f0; border-radius: 10px; background-color: #f8fafc;">
+                                <tr>
+                                    <td width="32" valign="top" style="padding: 16px 0 16px 16px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle;"><path fill="#FF5F00" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"></path></svg></td>
+                                    <td style="padding: 16px 16px 16px 1px; font-size: 14px; color: #475569; line-height: 1.6;">요청 주신 내용에 따라 <b><span id="p-exposure-date" class="var-fill">{연도}년 {월}월 {일}</span>까지 계정을 유지하여, 해당 기간 동안 전시 영상이 노출</b>될 수 있도록 조치하겠습니다.</td>
+                                </tr>
+                            </table>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr><td style="padding: 0 36px;"><div style="border-top: 1px solid #eeeeee;"></div></td></tr>
+                    <tr><td style="padding: 40px 40px 20px 40px; text-align: center;"><p style="font-size: 15px; color: #111827; line-height: 1.7; margin: 0; font-weight: 500;">오프보딩 과정에서 궁금하신 점이 있으시면<br>언제든 편하게 문의해 주세요.<br><br>그동안 모비두와 함께해 주셔서 다시 한번 감사드립니다.</p></td></tr>
+
+                    <tr><td style="padding: 10px 40px 60px 40px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #e5e7eb; border-radius: 16px;">
+                          <tr><td style="padding: 24px;"><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td valign="middle"><div style="font-size: 16px; font-weight: bold; color: #111827; margin-bottom: 6px;">💬 문의하기</div><div style="font-size: 13px; color: #6b7280;">궁금한 점은 카카오 채널 또는 메일로 문의해 주세요.</div></td><td width="180" valign="middle" align="right" style="padding-left: 15px;"><a href="http://pf.kakao.com/_CKxeSG" target="_blank" style="display: block; width: 100%; background-color: #fee500; color: #3c1e1e; text-decoration: none; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: bold; margin-bottom: 8px; text-align: center;">🔗 카카오 채널 문의</a><a href="mailto:csm_sol@mobidoo.co.kr" style="display: block; width: 100%; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: bold; text-align: center;">💌 메일 보내기</a></td></tr></table></td></tr>
+                        </table>
+                    </td></tr>
+                    <tr><td bgcolor="#f8f9fa" style="padding: 30px 40px; border-top: 1px solid #eeeeee; text-align: center;"><p style="font-size: 12px; color: #aaa; margin: 0;">Copyright © 2026 mobidoo. All Rights Reserved.</p></td></tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="panel-header">
+            <h2>Sauce CSM Mail Editor</h2>
+            <p>[모비두] OFF-BOARDING</p>
+        </div>
+        
+        <div class="panel-content">
+            <div class="section">
+                <span class="section-label">Email Title</span>
+                <div class="title-card">
+                    <div class="title-preview-text" id="title-preview">[모비두] 🤝 {회사명} 서비스 종료 및 오프보딩 안내</div>
+                    <button class="btn btn-dark" onclick="copyTitle()">제목 복사하기</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Common Variables</span>
+                <div class="input-group"><label>고객사명</label><input type="text" id="i-company" placeholder="회사명 입력" oninput="syncAll()"></div>
+                <div class="input-group"><label>담당자 이름</label><input type="text" id="i-manager" placeholder="이름 입력" oninput="syncAll()"></div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Schedule Settings</span>
+                <div class="input-group"><label>계약 종료일</label><input type="date" id="i-contract-end" oninput="syncAll()"></div>
+                <div class="input-group"><label>서비스 종료일 (도입부 자동연동)</label><input type="date" id="i-service-end" oninput="syncAll()"></div>
+                <div class="input-group"><label>회신 기한 (기본: 오늘+7영업일)</label><input type="date" id="i-deadline" oninput="syncAll()"></div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Service Blocks</span>
+                <label class="check-item"><input type="checkbox" id="check-live" checked onchange="toggleBlock('p-block-live', this)"> 소스라이브 포함</label>
+                <label class="check-item"><input type="checkbox" id="check-clip" checked onchange="toggleBlock('p-block-clip', this)"> 소스클립 포함</label>
+                <label class="check-item"><input type="checkbox" id="check-link" checked onchange="toggleBlock('p-block-link', this)"> 소스링크 포함</label>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Additional Requests</span>
+                <label class="check-item"><input type="checkbox" id="check-exposure" onchange="toggleBlock('p-exposure-block', this)"> <b>[요청 시]</b> 계정 유지 및 영상 노출 기간 포함</label>
+                <div id="exposure-input-wrap" style="display:none; padding-left: 28px;">
+                    <div class="input-group"><label>계정 노출 유지 기한</label><input type="date" id="i-exposure-end" oninput="syncAll()"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Actions</span>
+                <button class="btn btn-orange" onclick="copyMail()">메일 본문 복사하기</button>
+                <div class="help-text">날짜 형식이 yyyy. mm. dd로 자동 변환되어 복사됩니다.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">복사 완료!</div>
+
+    <script>
+        // 날짜 변환 함수 (yyyy-mm-dd -> yyyy. mm. dd)
+        function formatDate(val, style = 'dot') {
+            if(!val) return '';
+            const d = new Date(val);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return style === 'ko' ? `${y}년 ${m}월 ${day}일` : `${y}. ${m}. ${day}`;
+        }
+
+        // 영업일 기준 +7일 계산 함수
+        function getDeadlineDate() {
+            let date = new Date();
+            let count = 0;
+            while (count < 7) {
+                date.setDate(date.getDate() + 1);
+                if (date.getDay() !== 0 && date.getDay() !== 6) count++;
+            }
+            return date.toISOString().split('T')[0];
+        }
+
+        function toggleBlock(targetId, checkbox) {
+            const target = document.getElementById(targetId);
+            target.style.display = checkbox.checked ? 'block' : 'none';
+            if(targetId === 'p-exposure-block') {
+                document.getElementById('exposure-input-wrap').style.display = checkbox.checked ? 'block' : 'none';
+            }
+            syncAll();
+        }
+
+        function syncAll() {
+            const company = document.getElementById('i-company').value || '{회사명}';
+            const manager = document.getElementById('i-manager').value || '{담당자명}';
+            const contractDate = document.getElementById('i-contract-end').value;
+            const serviceDate = document.getElementById('i-service-end').value;
+            const deadlineDate = document.getElementById('i-deadline').value;
+            const exposureDate = document.getElementById('i-exposure-end').value;
+
+            // 텍스트 반영
+            document.getElementById('p-company-intro').innerText = company;
+            document.getElementById('p-manager').innerText = manager;
+            document.getElementById('title-preview').innerText = `[모비두] 🤝 ${company} 서비스 종료 및 오프보딩 안내`;
+
+            // 날짜 반영
+            document.getElementById('p-contract-end').innerText = formatDate(contractDate) || 'yyyy. mm. dd';
+            document.getElementById('p-service-end').innerText = formatDate(serviceDate) || 'yyyy. mm. dd';
+            document.getElementById('p-intro-date').innerText = formatDate(serviceDate, 'ko') || '{연도}년 {월}월 {일}일';
+            document.getElementById('p-deadline').innerText = formatDate(deadlineDate) || '{yyyy.mm.dd}';
+            document.getElementById('p-exposure-date').innerText = formatDate(exposureDate, 'ko') || '{연도}년 {월}월 {일}일';
+
+            // 하이라이트 제어
+            toggleHighlight(document.getElementById('p-company-intro'), company === '{회사명}');
+            toggleHighlight(document.getElementById('p-manager'), manager === '{담당자명}');
+            toggleHighlight(document.getElementById('p-contract-end'), !contractDate);
+            toggleHighlight(document.getElementById('p-service-end'), !serviceDate);
+            toggleHighlight(document.getElementById('p-intro-date'), !serviceDate);
+            toggleHighlight(document.getElementById('p-deadline'), !deadlineDate);
+            toggleHighlight(document.getElementById('p-exposure-date'), !exposureDate);
+        }
+
+        function toggleHighlight(el, isDimmed) {
+            isDimmed ? el.classList.add('var-fill') : el.classList.remove('var-fill');
+        }
+
+        function copyTitle() {
+            navigator.clipboard.writeText(document.getElementById('title-preview').innerText).then(() => showToast("제목 복사 완료!"));
+        }
+
+        async function copyMail() {
+            const fills = document.querySelectorAll('.var-fill');
+            fills.forEach(f => f.style.backgroundColor = 'transparent');
+            
+            // display:none인 블록은 복사 대상에서 제외하기 위해 임시로 DOM 처리
+            const root = document.getElementById('copy-target').cloneNode(true);
+            const invisibleItems = root.querySelectorAll('[style*="display: none"]');
+            invisibleItems.forEach(item => item.remove());
+
+            try {
+                const blob = new Blob([root.innerHTML], { type: 'text/html' });
+                await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]);
+                showToast("본문 복사 완료!");
+            } catch (err) { alert("복사 실패!"); }
+
+            fills.forEach(f => f.style.backgroundColor = '');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg; t.className = "show";
+            setTimeout(() => { t.className = ""; }, 2000);
+        }
+
+        window.onload = function() {
+            document.getElementById('i-deadline').value = getDeadlineDate();
+            document.getElementById('p-exposure-block').style.display = 'none';
+            syncAll();
+        };
+    </script>
+</body>
+</html>

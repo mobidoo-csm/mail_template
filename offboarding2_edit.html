@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauce CSM Mail Editor - Off-boarding Data</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --sauce-orange: #ff5f00;
+            --sauce-orange-hover: #e65600;
+            --sauce-black: #00020f;
+            --bg-workspace: #f3f4f6;
+            --panel-bg: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --border-color: #e5e7eb;
+            --btn-dark: #374151;
+            --btn-dark-hover: #111827;
+        }
+
+        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: var(--bg-workspace); display: flex; height: 100vh; overflow: hidden; color: var(--text-main); }
+
+        /* [좌측] 미리보기 영역 */
+        .preview-area { flex: 1; padding: 40px; overflow-y: auto; display: flex; justify-content: center; scroll-behavior: smooth; }
+
+        /* [우측] 제어 패널 */
+        .control-panel { width: 420px; background-color: var(--panel-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.03); }
+        .panel-header { padding: 30px 25px; background-color: var(--sauce-black); color: #ffffff; }
+        .panel-header h2 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--sauce-orange); }
+        .panel-header p { margin: 8px 0 0 0; font-size: 13px; opacity: 0.6; font-weight: 500; }
+        .panel-content { padding: 30px 25px; flex: 1; overflow-y: auto; }
+
+        .section { margin-bottom: 35px; }
+        .section-label { font-size: 12px; font-weight: 800; color: var(--sauce-orange); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 1px; }
+
+        .title-card { background-color: #f9fafb; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .title-preview-text { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.5; margin-bottom: 15px; word-break: break-all; }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .input-group input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 13px; box-sizing: border-box; transition: all 0.2s; font-family: inherit; }
+        .input-group input:focus { border-color: var(--sauce-orange); outline: none; box-shadow: 0 0 0 4px rgba(255, 95, 0, 0.1); }
+
+        .mode-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .mode-btn { flex: 1; padding: 12px; border: 1px solid var(--border-color); border-radius: 10px; background: #fff; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--text-sub); transition: all 0.2s; }
+        .mode-btn.active { background: var(--sauce-orange); color: #fff; border-color: var(--sauce-orange); }
+
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s; }
+        .btn-orange { background-color: var(--sauce-orange); color: white; margin-bottom: 12px; }
+        .btn-orange:hover { background-color: var(--sauce-orange-hover); transform: translateY(-1px); }
+        .btn-dark { background-color: var(--btn-dark); color: white; padding: 10px; font-size: 13px; }
+
+        .help-text { font-size: 12px; color: var(--text-sub); text-align: center; margin-top: 15px; line-height: 1.6; }
+        #toast { visibility: hidden; min-width: 220px; background-color: var(--sauce-black); color: #fff; text-align: center; border-radius: 50px; padding: 14px 24px; position: fixed; z-index: 2000; left: 50%; bottom: 40px; transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2s; }
+
+        .var-fill { background-color: #fff9c4; color: #d84315; font-weight: bold; border-radius: 2px; padding: 0 2px; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 40px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 40px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <div class="preview-area">
+        <div id="copy-target">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4" style="font-family: 'Pretendard', sans-serif;">
+              <tr>
+                <td align="center" style="padding: 40px 0;">
+                  <table width="600" border="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff" style="border: 1px solid #eeeeee; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                    
+                    <tr>
+                      <td bgcolor="#FF5F00" style="padding: 50px 40px; text-align: center; background: linear-gradient(135deg, #FF5F00 0%, #ff8a3d 100%);">
+                        <div style="display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; color: #ffffff; font-size: 13px; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;">OFF-BOARDING DATA</div>
+                        <h1 style="font-size: 32px; color: #ffffff; margin: 0; letter-spacing: -1px; font-weight: 800;">백업 데이터 전달 안내 📂</h1>
+                        <p style="font-size: 17px; color: #ffffff; margin-top: 12px; line-height: 1.5; opacity: 0.9;">요청하신 백업 데이터 준비가 완료되었습니다.</p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 40px 40px 10px 40px;">
+                        <p style="font-size: 15px; color: #333333; line-height: 1.7; margin: 0;">
+                          <span id="p-company-intro" class="var-fill">{회사명}</span> <span id="p-manager" class="var-fill">{담당자명}</span>님, 안녕하세요!<br>
+                          모비두 고객성공팀 솔루션파트입니다 😊<br><br>
+                          앞서 회신 주신 내용을 바탕으로<br>
+                          <b>요청하신 백업 데이터 준비가 완료</b>되어 안내드립니다.<br><br>
+                          <span id="p-intro-clause"></span>유효기한 내 다운로드를 완료해 주세요.
+                        </p>
+                      </td>
+                    </tr>
+
+                    <tr id="p-sftp-section">
+                      <td style="padding: 45px 36px 15px 36px;">
+                        <div style="font-size:18px; font-weight:800; color:#111827; margin-bottom:18px;">
+                            <span style="background: #FF5F00; width: 4px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 10px; border-radius: 2px;"></span>
+                            <span style="vertical-align: middle;">📅 SFTP 접속 정보 안내</span>
+                        </div>
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb; border-radius:14px; overflow:hidden;">
+                          <tr><td style="background-color:#f1f5f9; padding:18px 20px; border-bottom:1px solid #e2e8f0;"><div style="font-size: 16px; font-weight: 900; color: #475569; letter-spacing: -0.5px; display: flex; align-items: center;"><div style="margin-right: 12px; line-height: 0;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #ff5f56; margin-right: 6px;"></span><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #ffbd2e; margin-right: 6px;"></span><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #27c93f;"></span></div><span style="vertical-align: middle;">SFTP Connection Info</span></div></td></tr>
+                          <tr><td style="padding:20px; background-color:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0">
+                              <tr><td width="95" valign="top" style="padding-bottom:14px;"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">호스트 이름</div></td><td style="padding:0 0 14px 12px; font-size:14px; line-height:1.6; color:#374151; font-weight:600;"><span id="p-sftp-host" class="var-fill">sftp-partner.sauce.im</span></td></tr>
+                              <tr><td width="95" valign="top" style="padding-bottom:14px;"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">포트 번호</div></td><td style="padding:0 0 14px 12px; font-size:14px; line-height:1.6; color:#374151;"><span id="p-sftp-port" class="var-fill">22</span></td></tr>
+                              <tr><td width="95" valign="top" style="padding-bottom:14px;"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">사용자 이름</div></td><td style="padding:0 0 14px 12px; font-size:14px; line-height:1.6; color:#374151;"><span id="p-sftp-user" class="var-fill">{partner_id}-offboarding</span></td></tr>
+                              <tr><td width="95" valign="top"><div style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:800; padding:4px 0; border-radius:6px; text-align:center;">개인키 파일</div></td><td style="padding:0 0 0 12px; font-size:14px; line-height:1.6; color:#374151; font-weight:600;">첨부 파일 확인 <span style="background-color: #f1f5f9; color: #475569; font-size: 12px; padding: 2px 8px; border-radius: 4px; margin-left: 4px; border: 1px solid #e2e8f0; vertical-align: middle;"><span id="p-sftp-key" class="var-fill">{partner_id}-offboarding_key</span></span></td></tr>
+                              <tr><td colspan="2" align="center" style="padding-top: 20px;"><a href="https://www.app.guideflo.com/workspace/3114/manuals/22810/public" target="_blank" style="display: inline-block; background-color: #e2e8f0; border: 1px solid #cbd5e1; color: #334155; text-decoration: none; padding: 12px 36px; border-radius: 8px; font-size: 14px; font-weight: 800; text-align: center;"><span style="vertical-align: middle;">오프보딩 SFTP 사용 가이드 보러 가기</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="12" height="12" style="vertical-align: middle; margin-left: 4px; fill: #334155;"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h82.7L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3V192c0 17.7 14.3 32 32 32s32-14.3 32-32V32c0-17.7-14.3-32-32-32H320zM80 32C35.8 32 0 67.8 0 112V432c0 44.2 35.8 80 80 80H400c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32V432c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16H192c17.7 0 32-14.3 32-32s-14.3-32-32-32H80z"/></svg></a></td></tr>
+                          </table></td></tr>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 45px 36px 15px 36px;">
+                        <div style="font-size:18px; font-weight:800; color:#111827; margin-bottom:18px;">
+                          <span style="background: #FF5F00; width: 4px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 10px; border-radius: 2px;"></span>
+                          <span style="vertical-align: middle;">📦 백업 데이터 다운로드 안내</span>
+                        </div>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #fffaf5; border: 1px dashed #FF5F00; border-radius: 12px;">
+                          <tr><td style="padding: 20px;"><div style="font-size: 15px; line-height: 1.8; color: #4b5563;">📩 <span style="background-color: #FF5F00; color: #ffffff; font-weight: 800; font-size: 15px; padding: 3px 8px; border-radius: 4px;">다운로드 완료 후, 데이터가 정상적으로 확인되었는지 회신 부탁드립니다.</span><br><span style="color: #FF5F00; font-weight: 800; font-size: 16px; display: inline-block; margin-top: 6px;">⏳ 파일 유효기간 : 발송일로부터 약 1개월</span></div></td></tr>
+                        </table>
+                        <div style="margin: 10px 0 25px 4px; font-size: 13px; color: #6b7280; line-height: 1.6;">※ 보안 및 내부 정책에 따라 유효기간 이후에는 데이터 접근 및 재전달이 제한될 수 있습니다.<br>※ 반드시 유효기간 내 다운로드를 완료해 주세요.</div>
+                      </td>
+                    </tr>
+
+                    <tr><td style="padding: 30px 36px 40px 36px;"><table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #fff1f2; border: 1px solid #fecdd3; border-radius: 14px; overflow: hidden;"><tr><td width="8" bgcolor="#ef4444"></td><td style="padding: 24px;"><div style="font-size: 16px; font-weight: 900; color: #e11d48; margin-bottom: 8px; display: flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="18" height="18" style="margin-right: 8px; fill: #e11d48;"><path d="M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/></svg><span>서비스 종료 전 필수 안내</span></div><div style="font-size: 14px; color: #475569; line-height: 1.7; padding-left: 26px;">서비스 종료일 이후에는 반드시 <b style="color: #ef4444;">모비두 솔루션과 연동된 앱, 스크립트, SDK, API 호출 로직 등을 삭제 또는 비활성화 처리</b>해 주시기를 부탁드립니다.</div></td><td width="8" bgcolor="#ef4444"></td></tr></table></td></tr>
+                    
+                    <tr><td style="padding: 0 36px;"><div style="border-top: 1px solid #eeeeee;"></div></td></tr>
+                    <tr><td style="padding: 40px 40px 20px 40px; text-align: center;"><p style="font-size: 15px; color: #111827; line-height: 1.7; margin: 0; font-weight: 500;">백업 데이터 확인 과정에서 궁금하신 점이 있으시면<br>언제든 편하게 문의해 주세요.<br><br>그동안 모비두와 함께해 주셔서 다시 한번 감사드립니다.</p></td></tr>
+                    <tr><td style="padding: 10px 40px 60px 40px;"><table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #e5e7eb; border-radius: 16px;"><tr><td style="padding: 24px;"><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td valign="middle"><div style="font-size: 16px; font-weight: bold; color: #111827; margin-bottom: 6px;">💬 문의하기</div><div style="font-size: 13px; color: #6b7280;">궁금한 점은 카카오 채널 또는 메일로 문의해 주세요.</div></td><td width="180" valign="middle" align="right" style="padding-left: 15px;"><a href="http://pf.kakao.com/_CKxeSG" target="_blank" style="display: block; width: 100%; background-color: #fee500; color: #3c1e1e; text-decoration: none; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: bold; margin-bottom: 8px; text-align: center;">🔗 카카오 채널 문의</a><a href="mailto:csm_sol@mobidoo.co.kr" style="display: block; width: 100%; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: bold; text-align: center;">💌 메일 보내기</a></td></tr></table></td></tr></table></td></tr>
+                    <tr><td bgcolor="#f8f9fa" style="padding: 30px 40px; border-top: 1px solid #eeeeee; text-align: center;"><p style="font-size: 12px; color: #aaa; margin: 0;">Copyright © 2026 mobidoo. All Rights Reserved.</p></td></tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="panel-header">
+            <h2>Sauce CSM Mail Editor</h2>
+            <p>[모비두] OFF-BOARDING DATA</p>
+        </div>
+        
+        <div class="panel-content">
+            <div class="section">
+                <span class="section-label">Email Title</span>
+                <div class="title-card">
+                    <div class="title-preview-text" id="title-preview">[모비두] 📂 {회사명} 백업 데이터 전달 안내</div>
+                    <button class="btn btn-dark" onclick="copyTitle()">제목 복사하기</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Delivery Mode</span>
+                <div class="mode-selector">
+                    <button class="mode-btn active" id="mode-sftp" onclick="setMode('sftp')">SFTP 전달</button>
+                    <button class="mode-btn" id="mode-file" onclick="setMode('file')">파일 직접 첨부</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Common Variables</span>
+                <div class="input-group"><label>고객사명</label><input type="text" id="i-company" placeholder="회사명 입력" oninput="syncAll()"></div>
+                <div class="input-group"><label>담당자 이름</label><input type="text" id="i-manager" placeholder="이름 입력" oninput="syncAll()"></div>
+            </div>
+
+            <div id="sftp-settings" class="section">
+                <span class="section-label">SFTP Connection Settings</span>
+                <div class="input-group"><label>파트너 ID (자동 조합용)</label><input type="text" id="i-partner-id" placeholder="Partner ID 입력" oninput="syncAll()"></div>
+                <div class="input-group"><label>호스트 이름</label><input type="text" id="i-sftp-host" value="sftp-partner.sauce.im" oninput="syncAll()"></div>
+                <div class="input-group"><label>포트 번호</label><input type="text" id="i-sftp-port" value="22" oninput="syncAll()"></div>
+                <div class="input-group"><label>사용자 이름</label><input type="text" id="i-sftp-user" placeholder="자동 생성 (수정 가능)" oninput="syncAll()"></div>
+                <div class="input-group"><label>개인키 파일명</label><input type="text" id="i-sftp-key" placeholder="자동 생성 (수정 가능)" oninput="syncAll()"></div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Actions</span>
+                <button class="btn btn-orange" onclick="copyMail()">메일 본문 복사하기</button>
+                <div class="help-text">가운데 정렬과 원본 스타일이 유지된 채로 복사됩니다.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">복사 완료!</div>
+
+    <script>
+        let currentMode = 'sftp';
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-sftp').classList.toggle('active', mode === 'sftp');
+            document.getElementById('mode-file').classList.toggle('active', mode === 'file');
+            document.getElementById('sftp-settings').style.display = mode === 'sftp' ? 'block' : 'none';
+            syncAll();
+        }
+
+        function syncAll() {
+            const company = document.getElementById('i-company').value || '{회사명}';
+            const manager = document.getElementById('i-manager').value || '{담당자명}';
+            const partnerId = document.getElementById('i-partner-id').value;
+
+            document.getElementById('p-company-intro').innerText = company;
+            document.getElementById('p-manager').innerText = manager;
+            document.getElementById('title-preview').innerText = `[모비두] 📂 ${company} 백업 데이터 전달 안내`;
+
+            const introClause = document.getElementById('p-intro-clause');
+            const sftpSection = document.getElementById('p-sftp-section');
+
+            if (currentMode === 'sftp') {
+                // SFTP 모드일 때만 문구와 <br>을 포함
+                introClause.innerHTML = "안전한 데이터 전달을 위해 SFTP 접속 정보를 아래와 같이 전달드리오니,<br>";
+                sftpSection.style.display = 'table-row';
+
+                const host = document.getElementById('i-sftp-host').value || 'sftp-partner.sauce.im';
+                const port = document.getElementById('i-sftp-port').value || '22';
+                
+                const userIn = document.getElementById('i-sftp-user');
+                if(!userIn.getAttribute('data-edited') && partnerId) { userIn.value = partnerId + "-offboarding"; }
+                const user = userIn.value || (partnerId ? partnerId + "-offboarding" : "{partner_id}-offboarding");
+
+                const keyIn = document.getElementById('i-sftp-key');
+                if(!keyIn.getAttribute('data-edited') && partnerId) { keyIn.value = partnerId + "-offboarding_key"; }
+                const key = keyIn.value || (partnerId ? partnerId + "-offboarding_key" : "{partner_id}-offboarding_key");
+
+                document.getElementById('p-sftp-host').innerText = host;
+                document.getElementById('p-sftp-port').innerText = port;
+                document.getElementById('p-sftp-user').innerText = user;
+                document.getElementById('p-sftp-key').innerText = key;
+
+                toggleHighlight(document.getElementById('p-sftp-host'), host === 'sftp-partner.sauce.im' && !document.getElementById('i-sftp-host').value);
+                toggleHighlight(document.getElementById('p-sftp-port'), port === '22' && !document.getElementById('i-sftp-port').value);
+                toggleHighlight(document.getElementById('p-sftp-user'), !partnerId && !userIn.value);
+                toggleHighlight(document.getElementById('p-sftp-key'), !partnerId && !keyIn.value);
+            } else {
+                // 파일 모드일 때는 <span> 내용을 완전히 비움 (줄바꿈도 삭제됨)
+                introClause.innerHTML = "";
+                sftpSection.style.display = 'none';
+            }
+
+            toggleHighlight(document.getElementById('p-company-intro'), company === '{회사명}');
+            toggleHighlight(document.getElementById('p-manager'), manager === '{담당자명}');
+        }
+
+        document.getElementById('i-sftp-user').addEventListener('input', (e) => { e.target.setAttribute('data-edited', 'true'); });
+        document.getElementById('i-sftp-key').addEventListener('input', (e) => { e.target.setAttribute('data-edited', 'true'); });
+
+        function toggleHighlight(el, isDimmed) { if(el) isDimmed ? el.classList.add('var-fill') : el.classList.remove('var-fill'); }
+        function copyTitle() { navigator.clipboard.writeText(document.getElementById('title-preview').innerText).then(() => showToast("제목 복사 완료!")); }
+
+        async function copyMail() {
+            const fills = document.querySelectorAll('.var-fill');
+            fills.forEach(f => f.style.backgroundColor = 'transparent');
+            
+            const clone = document.getElementById('copy-target').cloneNode(true);
+            const hidden = clone.querySelectorAll('[style*="display: none"]');
+            hidden.forEach(h => h.remove());
+
+            try {
+                const blob = new Blob([clone.innerHTML], { type: 'text/html' });
+                await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]);
+                showToast("본문 복사 완료!");
+            } catch (err) { alert("복사 실패!"); }
+
+            fills.forEach(f => f.style.backgroundColor = '');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg; t.className = "show";
+            setTimeout(() => { t.className = ""; }, 2000);
+        }
+
+        window.onload = syncAll;
+    </script>
+</body>
+</html>
