@@ -3,274 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sauce CSM Email Template Hub</title>
+    <title>Sauce Solution Mail Hub</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
         :root {
             --sauce-orange: #ff5f00;
-            --sauce-orange-deep: #ff4713;
-            --sauce-black: #00020f;
-            --sauce-white: #ffffff;
-            --bg-light: #f8f9fa;
-            --text-gray: #4b5563;
+            --sauce-orange-light: #fff5ec;
+            --sauce-black: #111827;
+            --sauce-gray: #6b7280;
+            --bg-color: #f8fafc;
+            --card-border: #e2e8f0;
+            --svg-default: #94a3b8;
         }
 
         body {
             font-family: 'Pretendard', sans-serif;
-            background-color: var(--bg-light);
+            background-color: #cbd5e1; 
+            background-image: radial-gradient(#94a3b8 1px, transparent 1px);
+            background-size: 20px 20px;
             color: var(--sauce-black);
             margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-
-        header {
-            background: linear-gradient(to right, var(--sauce-orange), var(--sauce-orange-deep));
-            color: var(--sauce-white);
-            /* [수정 포인트] 아래쪽 패딩을 60px에서 100px로 늘려 텍스트 공간을 확보했습니다 */
-            padding: 60px 20px 100px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(255, 95, 0, 0.2);
-        }
-
-        header h1 {
-            font-size: 32px;
-            margin: 0;
-            font-weight: 800;
-            letter-spacing: -1px;
-        }
-
-        header p {
-            margin-top: 10px;
-            font-size: 16px;
-            opacity: 0.9;
-        }
-
-        .container {
-            max-width: 1000px;
-            /* [디자인 유지] 겹치는 효과를 위해 마이너스 마진을 그대로 유지합니다 */
-            margin: -40px auto 60px;
-            padding: 0 20px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            grid-auto-rows: 1fr;
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--sauce-white);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #eeeeee;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(255, 95, 0, 0.15);
-            border-color: var(--sauce-orange);
-        }
-
-        .card .icon {
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
-
-        .card h2 {
-            font-size: 20px;
-            margin: 0 0 12px 0;
-            font-weight: 700;
-            color: var(--sauce-black);
-        }
-
-        .card p {
-            font-size: 14px;
-            color: var(--text-gray);
-            flex-grow: 1;
-            margin-bottom: 25px;
-        }
-
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn {
-            display: block;
-            text-decoration: none;
-            text-align: center;
-            padding: 12px 0;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .btn-view {
-            background-color: var(--sauce-black);
-            color: var(--sauce-white);
-        }
-        .btn-view:hover {
-            background-color: #333333;
-        }
-
-        .btn-copy {
-            background-color: var(--sauce-orange);
-            color: var(--sauce-white);
-        }
-        .btn-copy:hover {
-            background-color: var(--sauce-orange-deep);
-        }
-
-        footer {
-            text-align: center;
             padding: 40px 20px;
-            color: #94a3b8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* 🍎 사파리 브라우저 프레임 */
+        .safari-window {
+            background-color: var(--bg-color);
+            width: 100%;
+            max-width: 1100px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .safari-header {
+            background-color: #f1f5f9;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .safari-dots { display: flex; gap: 8px; width: 80px; }
+        .safari-dots span { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background-color: #ff5f56; }
+        .dot-yellow { background-color: #ffbd2e; }
+        .dot-green { background-color: #27c93f; }
+
+        .safari-url {
+            background-color: #ffffff;
+            height: 28px;
+            padding: 0 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            flex: 1;
+            max-width: 400px;
+            justify-content: center;
         }
 
-        #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: var(--sauce-black);
-            color: #fff;
+        .safari-right { width: 80px; }
+
+        .hub-header {
             text-align: center;
-            border-radius: 50px;
-            padding: 16px;
-            position: fixed;
-            z-index: 1000;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            padding: 70px 20px 40px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        #toast.show {
-            visibility: visible;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        .hub-header .badge {
+            display: inline-block;
+            background-color: var(--sauce-orange-light);
+            color: var(--sauce-orange);
+            font-size: 13px;
+            font-weight: 800;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
         }
 
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        .hub-header h1 { font-size: 36px; font-weight: 900; margin: 0 0 12px 0; letter-spacing: -1px; }
+        .hub-header p { font-size: 16px; color: var(--sauce-gray); margin: 0; }
 
-        @media (max-width: 600px) {
-            header h1 { font-size: 24px; }
-            .grid { grid-template-columns: 1fr; }
+        .hub-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            padding: 20px 20px 80px 20px;
+            width: 100%;
+            box-sizing: border-box;
+            flex-wrap: wrap;
+        }
+
+        .product-group { display: flex; gap: 20px; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            border: 2px dashed #cbd5e1;
+            color: #94a3b8;
+        }
+
+        /* 카드 공통 스타일 */
+        .card {
+            background-color: #ffffff;
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            width: 220px;
+            padding: 40px 24px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--sauce-black);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        /* 호버 시 연한 오렌지 배경 + 진한 오렌지 테두리 */
+        .card:hover {
+            transform: translateY(-8px);
+            background-color: var(--sauce-orange-light);
+            border-color: var(--sauce-orange);
+            box-shadow: 0 20px 40px rgba(255, 95, 0, 0.1);
+        }
+
+        .card .icon-box {
+            width: 44px;
+            height: 44px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* SVG 색상 연동 */
+        .card svg { width: 100%; height: 100%; fill: var(--svg-default); transition: fill 0.3s ease; }
+        .card:hover svg { fill: var(--sauce-orange); transform: scale(1.1); }
+
+        .card h2 { font-size: 20px; font-weight: 800; margin: 0 0 10px 0; transition: color 0.3s ease; }
+        .card:hover h2 { color: var(--sauce-orange); }
+
+        .card p { font-size: 14px; color: var(--sauce-gray); margin: 0; line-height: 1.5; transition: color 0.3s ease; }
+
+        @media (max-width: 950px) {
+            .hub-container { flex-direction: column; }
+            .product-group { flex-direction: column; width: 100%; align-items: center; }
+            .card { width: 100%; max-width: 320px; }
+            .divider { transform: rotate(90deg); margin: 10px 0; }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>💌 소스라이브 고객 여정 메일 템플릿 💌</h1>
-    <p>파트너사 계정 안내 및 온보딩 등 성공적인 첫 방송 지원을 위한 통합 메일 템플릿 저장소</p>
-</header>
+<div class="safari-window">
+    
+    <div class="safari-header">
+        <div class="safari-dots">
+            <span class="dot-red"></span>
+            <span class="dot-yellow"></span>
+            <span class="dot-green"></span>
+        </div>
+        <div class="safari-url">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="width:12px; height:12px; fill:#94a3b8;"><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"/></svg>
+            mobidoo-csm.github.io/mail_template
+        </div>
+        <div class="safari-right"></div>
+    </div>
 
-<div class="container">
-    <div class="grid">
-        <div class="card">
-            <div class="icon">👋</div>
-            <h2>1. 웰컴 메일</h2>
-            <p>신규 고객사에게 발송하는 첫 인사 메일입니다. 소스라이브의 가치와 함께 하는 여정의 시작을 알립니다.</p>
-            <div class="btn-group">
-                <a href="https://mobidoo-csm.github.io/mail_template/saucelive/welcome_edit.html" target="_blank" class="btn btn-view">템플릿 보기</a>
-                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/saucelive/welcome.html')" class="btn btn-copy">템플릿 복사하기</button>
-            </div>
+    <div class="hub-header">
+        <div class="badge">CSM Mail Template Hub</div>
+        <h1>Sauce 솔루션별 메일 템플릿</h1>
+        <p>고객사 온보딩부터 오프보딩까지, 고객 여정 단계별로 활용할 수 있는 메일 템플릿을 정리한 페이지</p>
+    </div>
+
+    <div class="hub-container">
+        <div class="product-group">
+            <a href="https://mobidoo-csm.github.io/mail_template/page/saucelive/hub.html" class="card">
+                <div class="icon-box">
+                    <svg viewBox="0 0 576 512"><path d="M0 128C0 92.7 28.7 64 64 64H320c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zM559.1 99.8c10.4 5.6 16.9 16.4 16.9 28.2V384c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64L416 337.1V174.9l14.2-9.5 96-64c9.9-6.6 22.6-7.1 32.9-1.6z"/></svg>
+                </div>
+                <h2>소스라이브</h2>
+                <p>라이브 커머스 여정을<br>지원하는 메일 모음</p>
+            </a>
+
+            <a href="#" class="card">
+                <div class="icon-box">
+                    <svg viewBox="0 0 512 512"><path d="M448 96c0-35.3-28.7-64-64-64H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V96zM320 160H192L256 32h128L320 160zM128 32l64 128H64c-17.7 0-32-14.3-32-32V96c0-17.7 14.3-32 32-32H128zM32 416V192H480V416c0 17.7-14.3 32-32 32H64c-17.7 0-32-14.3-32-32z"/></svg>
+                </div>
+                <h2>소스클립</h2>
+                <p>클립 커머스 여정을<br>지원하는 메일 모음</p>
+            </a>
+
+            <a href="https://mobidoo-csm.github.io/mail_template/page/saucelink/hub.html" class="card">
+                <div class="icon-box">
+                    <svg viewBox="0 0 640 512"><path d="M579.8 267.7c56.5-56.5 56.5-148 0-204.5c-50-50-128.8-56.5-186.3-15.4l-1.6 1.1c-14.4 10.3-17.7 30.3-7.4 44.6s30.3 17.7 44.6 7.4l1.6-1.1c32.1-22.9 76-19.3 103.8 8.6c31.5 31.5 31.5 82.5 0 114L422.3 334.8c-31.5 31.5-82.5 31.5-114 0c-27.9-27.9-31.5-71.8-8.6-103.8l1.1-1.6c10.3-14.4 6.9-34.4-7.4-44.6s-34.4-6.9-44.6 7.4l-1.1 1.6C206.5 251.2 213 330 263 380c56.5 56.5 148 56.5 204.5 0L579.8 267.7zM60.2 244.3c-56.5 56.5-56.5 148 0 204.5c50 50 128.8 56.5 186.3 15.4l1.6-1.1c14.4-10.3 17.7-30.3 7.4-44.6s-30.3-17.7-44.6-7.4l-1.6 1.1c-32.1 22.9-76 19.3-103.8-8.6C74 372 74 321 105.5 289.5L217.7 177.2c31.5-31.5 82.5-31.5 114 0c27.9 27.9 31.5 71.8 8.6 103.8l-1.1 1.6c-10.3 14.4-6.9-34.4-7.4-44.6s-34.4-6.9-44.6 7.4l-1.1 1.6C433.5 260.8 427 182 377 132c-56.5-56.5-148-56.5-204.5 0L60.2 244.3z"/></svg>
+                </div>
+                <h2>소스링크</h2>
+                <p>어필리에이트 커머스 여정을<br>지원하는 메일 모음</p>
+            </a>
         </div>
 
-        <div class="card">
-            <div class="icon">🔑</div>
-            <h2>2. 계정 정보 안내</h2>
-            <p>서비스 이용을 위한 어드민 계정 정보와 사용자 가이드를 제공합니다.</p>
-            <div class="btn-group">
-                <a href="https://mobidoo-csm.github.io/mail_template/saucelive/account_edit.html" target="_blank" class="btn btn-view">템플릿 보기</a>
-                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/saucelive/account.html')" class="btn btn-copy">템플릿 복사하기</button>
-            </div>
+        <div class="divider">
+            <svg viewBox="0 0 448 512" style="width:16px; height:16px;"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
         </div>
 
-        <div class="card">
-            <div class="icon">📅</div>
-            <h2>3. 온보딩 일정 안내</h2>
-            <p>확정된 온보딩 세션의 일시 및 참여 방법을 안내하고 온보딩 진행 내용 관련 사전 설문을 요청합니다.</p>
-            <div class="btn-group">
-                <a href="https://mobidoo-csm.github.io/mail_template/saucelive/onboarding_edit.html" target="_blank" class="btn btn-view">템플릿 보기</a>
-                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/saucelive/onboarding.html')" class="btn btn-copy">템플릿 복사하기</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="icon">📝</div>
-            <h2>4. 온보딩 후속 안내</h2>
-            <p>온보딩 세션 중 발생한 Q&A 정리와 플레이어 세부 설정을 위한 Config 설문을 안내합니다.</p>
-            <div class="btn-group">
-                <a href="https://mobidoo-csm.github.io/mail_template/saucelive/onboarding2_edit.html" target="_blank" class="btn btn-view">템플릿 보기</a>
-                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/saucelive/onboarding2.html')" class="btn btn-copy">템플릿 복사하기</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="icon">✅</div>
-            <h2>5. 첫 방송 전 체크리스트</h2>
-            <p>성공적인 첫 방송 진행을 위해 방송 직전 반드시 확인해야 할 기술/운영 항목들을 점검합니다.</p>
-            <div class="btn-group">
-                <a href="https://mobidoo-csm.github.io/mail_template/saucelive/livechecklist_edit.html" target="_blank" class="btn btn-view">템플릿 보기</a>
-                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/saucelive/livechecklist.html')" class="btn btn-copy">템플릿 복사하기</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="icon">🥂</div>
-            <h2>6. 첫 방송 후 리포트</h2>
-            <p>방송 종료 후 성과 지표를 공유하고 만족도 조사를 진행합니다.</p>
-            <div class="btn-group">
-                <a href="https://mobidoo-csm.github.io/mail_template/saucelive/afterlive_edit.html" target="_blank" class="btn btn-view">템플릿 보기</a>
-                <button onclick="copyRichText('https://mobidoo-csm.github.io/mail_template/page/saucelive/afterlive.html')" class="btn btn-copy">템플릿 복사하기</button>
-            </div>
+        <div>
+            <a href="#" class="card">
+                <div class="icon-box">
+                    <svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1L128 320c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l192 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L96 480c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>
+                </div>
+                <h2>오프보딩</h2>
+                <p>서비스 종료 및 데이터 백업을<br>안내하는 메일 모음</p>
+            </a>
         </div>
     </div>
+    
 </div>
-
-<div id="toast">✅ 템플릿이 복사되었습니다! 메일 창에 붙여넣으세요.</div>
-
-<footer>
-    <p>Copyright © 2026 mobidoo. All Rights Reserved.</p>
-</footer>
-
-<script>
-    async function copyRichText(url) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('파일을 가져올 수 없습니다.');
-            const htmlText = await response.text();
-
-            const type = "text/html";
-            const blob = new Blob([htmlText], { type });
-            const data = [new ClipboardItem({ [type]: blob })];
-
-            await navigator.clipboard.write(data);
-            showToast();
-        } catch (err) {
-            console.error(err);
-            alert('복사 중 오류가 발생했습니다. [템플릿 보기] 창에서 전체 선택(Ctrl+A) 후 복사해 주세요.');
-        }
-    }
-
-    function showToast() {
-        const toast = document.getElementById("toast");
-        toast.className = "show";
-        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
-    }
-</script>
-
 </body>
 </html>
