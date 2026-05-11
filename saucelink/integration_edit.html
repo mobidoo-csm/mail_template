@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauce CSM Mail Editor - SauceLink Integration</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --sauce-orange: #ff5f00;
+            --sauce-orange-hover: #e65600;
+            --sauce-black: #00020f;
+            --bg-workspace: #f3f4f6;
+            --panel-bg: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --border-color: #e5e7eb;
+            --btn-dark: #374151;
+            --btn-dark-hover: #111827;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            margin: 0; padding: 0;
+            background-color: var(--bg-workspace);
+            display: flex; height: 100vh;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        /* [좌측] 미리보기 영역 */
+        .preview-area {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            scroll-behavior: smooth;
+        }
+
+        /* [우측] 제어 패널 */
+        .control-panel {
+            width: 420px;
+            background-color: var(--panel-bg);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.03);
+        }
+
+        .panel-header {
+            padding: 30px 25px;
+            background-color: var(--sauce-black);
+            color: #ffffff;
+        }
+        .panel-header h2 { 
+            margin: 0; font-size: 22px; font-weight: 800; 
+            letter-spacing: -0.5px; color: var(--sauce-orange);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .panel-header p { margin: 8px 0 0 0; font-size: 13px; opacity: 0.6; font-weight: 500; }
+
+        .panel-content { padding: 30px 25px; flex: 1; overflow-y: auto; }
+
+        .section { margin-bottom: 35px; }
+        .section-label { 
+            font-size: 12px; font-weight: 800; color: var(--sauce-orange); 
+            text-transform: uppercase; margin-bottom: 12px; display: block;
+            letter-spacing: 1px;
+        }
+
+        .title-card {
+            background-color: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .title-preview-text { 
+            font-size: 14px; font-weight: 700; color: var(--text-main); 
+            line-height: 1.5; margin-bottom: 15px; word-break: break-all;
+        }
+
+        /* 입력 그룹 */
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .input-group input {
+            width: 100%; padding: 14px 16px; border: 1.5px solid var(--border-color); border-radius: 10px;
+            font-size: 14px; box-sizing: border-box; transition: all 0.2s;
+            font-family: inherit;
+        }
+        .input-group input:focus { border-color: var(--sauce-orange); outline: none; box-shadow: 0 0 0 4px rgba(255, 95, 0, 0.1); }
+
+        /* 버튼 */
+        .btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 16px; border: none; border-radius: 12px;
+            font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-orange { background-color: var(--sauce-orange); color: white; margin-bottom: 12px; }
+        .btn-orange:hover { background-color: var(--sauce-orange-hover); transform: translateY(-1px); }
+        .btn-dark { background-color: var(--btn-dark); color: white; padding: 10px; font-size: 13px; }
+        .btn-dark:hover { background-color: var(--btn-dark-hover); transform: translateY(-1px); }
+
+        .help-text { font-size: 12px; color: var(--text-sub); text-align: center; margin-top: 15px; line-height: 1.6; }
+
+        #toast {
+            visibility: hidden; min-width: 220px; background-color: var(--sauce-black); color: #fff;
+            text-align: center; border-radius: 50px; padding: 14px 24px;
+            position: fixed; z-index: 2000; left: 50%; bottom: 40px; transform: translateX(-50%);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2s; }
+
+        .var-fill { background-color: #fff9c4; color: #d84315; font-weight: bold; border-radius: 2px; padding: 0 2px; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 40px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 40px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <div class="preview-area">
+        <div id="copy-target">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4" style="font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;">
+              <tr>
+                <td align="center" style="padding: 40px 0;">
+                  <table width="600" border="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff" style="border: 1px solid #eeeeee; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 2, 15, 0.1);">
+                    
+                    <tr>
+                      <td style="padding: 50px 40px; text-align: center; background: #ff5f00; background: linear-gradient(to right, #ff5f00, #ff4713);">
+                        <div style="display: inline-block; background: rgba(0, 2, 15, 0.2); padding: 8px 16px; border-radius: 20px; color: #ffffff; font-size: 13px; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;">INTEGRATION CHECK</div>
+                        <h1 style="font-size: 35px; color: #ffffff; margin: 0; letter-spacing: -1px; font-weight: 800;">소스링크 연동을 완료해 주세요 🔗</h1>
+                        <p style="font-size: 18px; color: #ffffff; margin-top: 12px; line-height: 1.5; opacity: 0.9;">소스링크 사용을 위해 자사몰 연동 및 테스트가 필요합니다.</p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 45px 45px 10px 45px;">
+                        <p style="font-size: 16px; color: #333333; line-height: 1.8; margin: 0;">
+                          <span id="p-company-intro" class="var-fill">{회사명}</span> <span id="p-manager" class="var-fill">{담당자명}</span>님, 안녕하세요!<br>
+                          모비두 고객성공팀 솔루션파트입니다 😊<br><br>
+                          소스링크 계정 발급이 완료되어<br>
+                          크리에이터 링크 생성 및 캠페인 운영이 가능합니다! 🎉<br><br>
+                          다만, <b>성과 추적을 위해서는<br>
+                          자사몰과의 연동 및 테스트 작업이 반드시 필요</b>합니다.<br><br>
+                          아래 내용을 확인하시며 연동을 진행해 주시고,<br>
+                          연동 완료 후 테스트 신청까지 함께 진행해 주세요.<br>
+                        </p>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 20px 30px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#f8f9fa; border-radius:12px; padding:25px 10px;">
+                          <tbody><tr><td align="center"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; border:1px solid #ddd; color:#999; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">1</div><div style="font-size:13px; color:#999;">계정 발급</div></td>
+                            <td width="30" style="padding-bottom:25px; color:#cccccc; text-align:center; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold;">&gt;</td>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; background-color:#ff5f00; color:#ffffff; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">2</div><div style="font-size:13px; font-weight:bold; color:#ff5f00;">정합 및 테스트</div></td>
+                            <td width="30" style="padding-bottom:25px; color:#cccccc; text-align:center; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold;">&gt;</td>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; border:1px solid #ddd; color:#999; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">3</div><div style="font-size:12px; color:#999;">온보딩</div></td>
+                            <td width="30" style="padding-bottom:25px; color:#cccccc; text-align:center; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold;">&gt;</td>
+                            <td align="center" width="95"><div style="width:35px; height:35px; line-height:35px; border:1px solid #ddd; color:#999; border-radius:50%; font-weight:bold; margin-bottom:8px; font-size:13px;">4</div><div style="font-size:13px; color:#999;">첫 캠페인 진행</div></td>
+                          </tr></tbody></table></td></tr></tbody>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding: 20px 45px 40px 45px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border: 1px solid #eeeeee; border-radius: 20px; overflow: hidden; background-color: #ffffff;">
+                          <tbody>
+                            <tr>
+                              <td style="padding: 35px 30px 10px 30px;">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                  <tbody>
+                                    <tr>
+                                      <td width="32" valign="top"><div style="width:24px; height:24px; line-height:24px; background-color:#00020f; color:#ffffff; border-radius:50%; text-align:center; font-size:12px; font-weight:bold;">1</div></td>
+                                      <td>
+                                        <h3 style="font-size: 19px; margin: 0 0 10px 0; color: #111827;">🔗 연동 가이드 안내</h3>
+                                        <p style="font-size: 15px; color: #4b5563; line-height: 1.6; margin: 0 0 20px 0;">소스링크는 아래와 같은 연동 방식을 지원합니다.<br>운영 환경에 맞는 방식을 선택하여 연동을 진행해 주세요.</p>
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 20px;">
+                                          <tbody><tr>
+                                              <td width="32%" align="center" style="background: #f8f9fa; padding: 12px; border-radius: 10px; border: 1px solid #e5e7eb; font-size: 13px; font-weight: bold; color: #ff5f00;">웹빌더 연동</td>
+                                              <td width="2%"></td>
+                                              <td width="32%" align="center" style="background: #f8f9fa; padding: 12px; border-radius: 10px; border: 1px solid #e5e7eb; font-size: 13px; font-weight: bold; color: #ff5f00;">MMP 연동</td>
+                                              <td width="2%"></td>
+                                              <td width="32%" align="center" style="background: #f8f9fa; padding: 12px; border-radius: 10px; border: 1px solid #e5e7eb; font-size: 13px; font-weight: bold; color: #ff5f00;">Web SDK 연동</td>
+                                          </tr></tbody>
+                                        </table>
+                                        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">※ 연동 방식에 따라 정산 데이터 연동이 추가로 필요할 수 있습니다.</p>
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                          <tbody><tr><td align="center" bgcolor="#00020f" style="border-radius: 10px; padding: 16px 0;"><a href="https://docs.sauce.im/docs/saucelink-userflow" target="_blank" style="font-size: 15px; font-weight: bold; color: #ffffff; text-decoration: none; display: block;">📚 소스링크 퀵 가이드 보러가기</a></td></tr></tbody>
+                                        </table>
+                                        <div style="margin-top: 15px; text-align: center;">
+                                            <span style="display: inline-block; background-color: #fef2eb; color: #ff5f00; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; vertical-align: middle;">💡 TIP</span>
+                                            <span style="font-size: 13px; color: #64748b; margin-left: 4px; vertical-align: middle;">퀵 가이드 내 <b style="color: #ff5f00;">2번의 연동하기</b> 부분을 참고해 주세요.</span>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr><td align="center" style="padding: 30px 0;"><div style="color: #ff5f00; font-size: 20px; font-weight: bold; line-height: 1;">︾</div></td></tr>
+                            <tr>
+                              <td style="padding: 0 30px 35px 30px;">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                  <tbody><tr>
+                                      <td width="32" valign="top"><div style="width:24px; height:24px; line-height:24px; background-color:#ff5f00; color:#ffffff; border-radius:50%; text-align:center; font-size:12px; font-weight:bold;">2</div></td>
+                                      <td>
+                                        <h3 style="font-size: 19px; margin: 0 0 10px 0; color: #111827;">📝 연동 완료 후 테스트 요청</h3>
+                                        <p style="font-size: 15px; color: #4b5563; line-height: 1.6; margin: 0 0 20px 0;">연동 완료 후, 정상 동작 확인 및 온보딩 진행을 위해<br>아래 프로세스에 따라 신청해 주세요.</p>
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 20px;">
+                                          <tbody><tr>
+                                              <td width="47%" align="center" style="background: #f8f9fa; padding: 12px 5px; border-radius: 10px; border: 1px solid #e5e7eb; font-size: 13px; font-weight: bold; color: #4b5563;">자사몰 연동 완료</td>
+                                              <td width="6%" align="center" style="color: #cccccc; font-weight: bold;">&gt;</td>
+                                              <td width="47%" align="center" style="background: #fff8f0; padding: 12px 5px; border-radius: 10px; border: 1px solid #ff5f00; font-size: 13px; font-weight: bold; color: #ff5f00;">테스트/온보딩 신청</td>
+                                          </tr></tbody>
+                                        </table>
+                                        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px; line-height: 1.6;">※ 테스트 완료 후 어드민 사용 교육이 진행됩니다.<br>※ 일정은 신청하신 날짜를 기준으로 최종 조율하여 안내드립니다.</p>
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                          <tbody><tr><td align="center" bgcolor="#ff5f00" style="border-radius: 10px; padding: 16px 30px; box-shadow: 0 4px 10px rgba(255, 95, 0, 0.2);"><a href="https://tally.so/r/A76vpB" target="_blank" style="font-size: 15px; font-weight: bold; color: #ffffff; text-decoration: none; display: block;">📝 테스트 및 온보딩 신청하기</a></td></tr></tbody>
+                                        </table>
+                                      </td>
+                                  </tr></tbody>
+                                </table>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr><td style="padding: 0 40px;"><div style="border-top: 1px solid #eeeeee;"></div></td></tr>
+
+                    <tr>
+                      <td style="padding: 40px 45px 30px 45px;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #fff8f0; border-radius: 24px; border: 1px solid #ffc9a8;">
+                          <tbody><tr><td style="padding: 40px 30px; text-align: center;" align="center">
+                              <p style="font-size: 18px; color: #ff4713; line-height: 1.4; margin: 0 0 10px 0; font-weight: 800;">🚨 연동 과정 중 이슈 발생 시 🚨</p>
+                              <p style="font-size: 15px; color: #00020f; line-height: 1.6; margin: 0 0 25px 0;">예상치 못한 상황이 발생하더라도 당황하지 마세요.<br>고객성공팀이 원활한 연동 진행을 위해 대기하고 있습니다.<br><br>카카오채널로 즉시 연락해 주시면 빠르게 지원해 드리겠습니다.</p>
+                              <table border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
+                                <tbody><tr><td align="center" bgcolor="#fee500" style="border-radius: 12px; padding: 15px 30px;"><a href="https://pf.kakao.com/_CKxeSG" target="_blank" style="font-size: 15px; font-weight: bold; color: #3c1e1e; text-decoration: none; display: block;">💬 카카오채널 문의하기</a></td></tr></tbody>
+                              </table>
+                          </td></tr></tbody>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr><td bgcolor="#f8f9fa" style="padding: 30px 40px; border-top: 1px solid #eeeeee; text-align: center;"><p style="font-size: 12px; color: #aaa; margin: 0;">Copyright © 2026 mobidoo. All Rights Reserved.</p></td></tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="panel-header">
+            <h2>Sauce CSM Mail Editor</h2>
+            <p>[소스링크] INTEGRATION CHECK</p>
+        </div>
+        
+        <div class="panel-content">
+            <div class="section">
+                <span class="section-label">Email Title</span>
+                <div class="title-card">
+                    <div class="title-preview-text" id="title-preview">[소스링크] 🔗 {회사명}의 소스링크 연동을 완료해 주세요</div>
+                    <button class="btn btn-dark" onclick="copyTitle()">제목 복사하기</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Common Variables</span>
+                <div class="input-group">
+                    <label>고객사명</label>
+                    <input type="text" id="i-company" placeholder="회사명 입력" oninput="syncAll()">
+                </div>
+                <div class="input-group">
+                    <label>담당자 이름</label>
+                    <input type="text" id="i-manager" placeholder="이름 입력" oninput="syncAll()">
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-label">Actions</span>
+                <button class="btn btn-orange" onclick="copyMail()">메일 본문 복사하기</button>
+                <div class="help-text">가운데 정렬과 원본 스타일이 유지된 채로 복사됩니다.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">복사 완료!</div>
+
+    <script>
+        function syncAll() {
+            const company = document.getElementById('i-company').value || '{회사명}';
+            const manager = document.getElementById('i-manager').value || '{담당자명}';
+
+            // 텍스트 반영
+            document.getElementById('p-company-intro').innerText = company;
+            document.getElementById('p-manager').innerText = manager;
+            
+            // 제목 반영
+            document.getElementById('title-preview').innerText = `[소스링크] 🔗 ${company}의 소스링크 연동을 완료해 주세요`;
+
+            // 하이라이트 제어
+            toggleHighlight(document.getElementById('p-company-intro'), company === '{회사명}');
+            toggleHighlight(document.getElementById('p-manager'), manager === '{담당자명}');
+        }
+
+        function toggleHighlight(el, isDimmed) {
+            isDimmed ? el.classList.add('var-fill') : el.classList.remove('var-fill');
+        }
+
+        function copyTitle() {
+            const text = document.getElementById('title-preview').innerText;
+            navigator.clipboard.writeText(text).then(() => showToast("제목이 복사되었습니다."));
+        }
+
+        async function copyMail() {
+            // 하이라이트 일시 제거
+            const fills = document.querySelectorAll('.var-fill');
+            fills.forEach(f => f.style.backgroundColor = 'transparent');
+            
+            const root = document.getElementById('copy-target');
+            const html = root.innerHTML;
+
+            try {
+                const blob = new Blob([html], { type: 'text/html' });
+                const data = [new ClipboardItem({ 'text/html': blob })];
+                await navigator.clipboard.write(data);
+                showToast("본문이 복사되었습니다.");
+            } catch (err) {
+                alert("복사 실패! 크롬 브라우저를 권장합니다.");
+            }
+
+            // 하이라이트 원복
+            fills.forEach(f => f.style.backgroundColor = '');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg; t.className = "show";
+            setTimeout(() => { t.className = ""; }, 2000);
+        }
+
+        // 초기 상태 싱크
+        window.onload = syncAll;
+    </script>
+</body>
+</html>
