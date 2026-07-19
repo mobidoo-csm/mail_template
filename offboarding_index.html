@@ -36,6 +36,7 @@
             background-color: var(--bg-light);
             width: 100%;
             max-width: 1100px;
+            height: min(610px, calc(100vh - 80px));
             border-radius: 16px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.05);
             overflow: hidden;
@@ -52,6 +53,12 @@
             padding: 0 20px;
             border-bottom: 1px solid #e2e8f0;
             flex-shrink: 0;
+        }
+
+        .safari-content {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
         }
 
         .safari-dots { display: flex; gap: 8px; width: 80px; }
@@ -243,6 +250,8 @@
         <div class="safari-right"></div>
     </div>
 
+    <div class="safari-content">
+
 <header>
     <h1>👋 오프보딩 메일 템플릿 저장소</h1>
     <p>서비스 종료 일정 안내부터 최종 백업 데이터 전달까지 원활한 오프보딩을 지원합니다.</p>
@@ -275,6 +284,8 @@
 <footer>
     <p>Copyright © 2026 mobidoo. All Rights Reserved.</p>
 </footer>
+
+    </div>
 
 </div>
 
