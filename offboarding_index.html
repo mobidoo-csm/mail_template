@@ -17,12 +17,67 @@
 
         body {
             font-family: 'Pretendard', sans-serif;
-            background-color: var(--bg-light);
+            background-color: #cbd5e1;
+            background-image: radial-gradient(#94a3b8 1px, transparent 1px);
+            background-size: 20px 20px;
             color: var(--sauce-black);
             margin: 0;
-            padding: 0;
+            padding: 40px 20px;
             line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
+
+        /* 🍎 사파리 브라우저 프레임 */
+        .safari-window {
+            background-color: var(--bg-light);
+            width: 100%;
+            max-width: 1100px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .safari-header {
+            background-color: #f1f5f9;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .safari-dots { display: flex; gap: 8px; width: 80px; }
+        .safari-dots span { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background-color: #ff5f56; }
+        .dot-yellow { background-color: #ffbd2e; }
+        .dot-green { background-color: #27c93f; }
+
+        .safari-url {
+            background-color: #ffffff;
+            height: 28px;
+            padding: 0 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            flex: 1;
+            max-width: 400px;
+            justify-content: center;
+        }
+
+        .safari-right { width: 80px; }
 
         header {
             background: linear-gradient(to right, var(--sauce-orange), var(--sauce-orange-deep));
@@ -46,14 +101,16 @@
         }
 
         .container {
+            width: 100%;
             max-width: 800px; /* 카드가 2개이므로 최대 너비를 살짝 줄여 안정감을 주었습니다 */
             margin: -40px auto 60px;
             padding: 0 20px;
         }
 
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 25px;
         }
 
@@ -66,6 +123,9 @@
             display: flex;
             flex-direction: column;
             border: 1px solid #eeeeee;
+            box-sizing: border-box;
+            flex: 1 1 280px;
+            max-width: 300px;
         }
 
         .card:hover {
@@ -159,9 +219,29 @@
 
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+        @media (max-width: 640px) {
+            header h1 { font-size: 24px; }
+            .card { flex: 1 1 100%; max-width: 400px; }
+        }
     </style>
 </head>
 <body>
+
+<div class="safari-window">
+
+    <div class="safari-header">
+        <div class="safari-dots">
+            <span class="dot-red"></span>
+            <span class="dot-yellow"></span>
+            <span class="dot-green"></span>
+        </div>
+        <div class="safari-url">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="width:12px; height:12px; fill:#94a3b8;"><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"/></svg>
+            mobidoo-csm.github.io/mail_template
+        </div>
+        <div class="safari-right"></div>
+    </div>
 
 <header>
     <h1>👋 오프보딩 메일 템플릿 저장소</h1>
@@ -192,11 +272,13 @@
     </div>
 </div>
 
-<div id="toast">✅ 템플릿이 복사되었습니다! 메일 창에 붙여넣으세요.</div>
-
 <footer>
     <p>Copyright © 2026 mobidoo. All Rights Reserved.</p>
 </footer>
+
+</div>
+
+<div id="toast">✅ 템플릿이 복사되었습니다! 메일 창에 붙여넣으세요.</div>
 
 <script>
     async function copyRichText(url) {
