@@ -62,8 +62,6 @@
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2s; }
 
         .var-fill { background-color: #fff9c4; color: #d84315; font-weight: bold; border-radius: 2px; padding: 0 2px; }
-        .copyable { cursor: pointer; border-radius: 3px; transition: box-shadow 0.15s ease; }
-        .copyable:hover { box-shadow: 0 0 0 3px rgba(255, 95, 0, 0.25); }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 40px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 40px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
@@ -102,9 +100,9 @@
                         <h3 style="font-size: 18px; margin: 20px 0 15px 0; color: #111827; border-left: 4px solid #ff5f00; padding-left: 10px;">💌 소스라이브 계정 정보</h3>
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #fef2eb; border-radius: 16px; padding: 25px; border: 1px solid #ff5f00;">
                           <tr><td><table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                <tr><td width="120" style="font-size: 14px; color: #ff5f00; font-weight: bold; padding-bottom: 12px;">파트너 아이디</td><td style="font-size: 15px; font-weight: bold; color: #111827; padding-bottom: 12px;"><span id="p-partner-id" class="var-fill copyable">{파트너아이디}</span></td></tr>
-                                <tr><td style="font-size: 14px; color: #ff5f00; font-weight: bold; padding-bottom: 12px;">아이디</td><td style="font-size: 15px; font-weight: bold; color: #111827; padding-bottom: 12px;"><span id="p-account-id" class="var-fill copyable">{계정아이디}</span></td></tr>
-                                <tr><td style="font-size: 14px; color: #ff5f00; font-weight: bold;">비밀번호</td><td style="font-size: 15px; font-weight: bold;"><span class="copyable" style="background-color: #000000; color: #000000; padding: 2px 8px; border-radius: 4px; font-family: inherit;"><span id="p-password" class="var-fill">{비밀번호}</span></span><span style="font-size: 12px; color: #ff3d33; font-weight: normal; margin-left: 10px;">(클릭하여 복사)</span></td></tr>
+                                <tr><td width="120" style="font-size: 14px; color: #ff5f00; font-weight: bold; padding-bottom: 12px;">파트너 아이디</td><td style="font-size: 15px; font-weight: bold; color: #111827; padding-bottom: 12px;"><span id="p-partner-id" class="var-fill">{파트너아이디}</span></td></tr>
+                                <tr><td style="font-size: 14px; color: #ff5f00; font-weight: bold; padding-bottom: 12px;">아이디</td><td style="font-size: 15px; font-weight: bold; color: #111827; padding-bottom: 12px;"><span id="p-account-id" class="var-fill">{계정아이디}</span></td></tr>
+                                <tr><td style="font-size: 14px; color: #ff5f00; font-weight: bold;">비밀번호</td><td style="font-size: 15px; font-weight: bold;"><span style="background-color: #000000; color: #000000; padding: 2px 8px; border-radius: 4px; font-family: inherit;"><span id="p-password" class="var-fill">{비밀번호}</span></span><span style="font-size: 12px; color: #ff3d33; font-weight: normal; margin-left: 10px;">(검은 영역 드래그하여 확인)</span></td></tr>
                           </table></td></tr>
                         </table>
                       </td>
@@ -323,13 +321,6 @@
         }
 
         window.onload = syncAll;
-
-        document.getElementById('copy-target').addEventListener('click', (e) => {
-            const el = e.target.closest('.copyable');
-            if (!el) return;
-            const value = el.innerText.trim();
-            navigator.clipboard.writeText(value).then(() => showToast('값이 복사되었습니다.'));
-        });
     </script>
 </body>
 </html>
