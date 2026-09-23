@@ -460,7 +460,7 @@
 
     <div class="control-panel">
         <div class="panel-header">
-            <h2>Sauce CSM Mail Builder</h2>
+            <h2>Sauce CSM Mail Editor</h2>
             <p>[소스클립] WELCOME MAIL</p>
         </div>
 
@@ -468,7 +468,7 @@
             <div class="section">
                 <span class="section-label">메일 제목</span>
                 <div class="title-card">
-                    <div class="title-preview-text" id="title-preview">[소스클립] 👋 Welcome to Sauce! {회사명}의 성공적인 숏폼 커머스 여정을 함께합니다</div>
+                    <div class="title-preview-text" id="title-preview">[소스클립] 👋 Welcome to Sauce! <span class="var-fill">{회사명}</span>의 성공적인 숏폼 커머스 여정을 함께합니다</div>
                     <button class="btn btn-dark" onclick="copyTitle()">제목 복사하기</button>
                 </div>
             </div>
@@ -509,7 +509,7 @@
             company === '{회사명}' ? pCompany.classList.add('var-fill') : pCompany.classList.remove('var-fill');
             manager === '{담당자명}' ? pManager.classList.add('var-fill') : pManager.classList.remove('var-fill');
 
-            document.getElementById('title-preview').innerText = `[소스클립] 👋 Welcome to Sauce! ${company}의 성공적인 숏폼 커머스 여정을 함께합니다`;
+            document.getElementById('title-preview').innerHTML = `[소스클립] 👋 Welcome to Sauce! <span class="${company === '{회사명}' ? 'var-fill' : ''}">${company}</span>의 성공적인 숏폼 커머스 여정을 함께합니다`;
         }
 
         function copyTitle() {
