@@ -228,7 +228,7 @@
             <div class="section">
                 <span class="section-label">Email Title</span>
                 <div class="title-card">
-                    <div class="title-preview-text" id="title-preview">[소스링크] 🗓️ {회사명}의 온보딩 일정이 확정되었습니다.</div>
+                    <div class="title-preview-text" id="title-preview">[소스링크] 🗓️ <span class="var-fill">{회사명}</span>의 온보딩 일정이 확정되었습니다.</div>
                     <button class="btn btn-dark" onclick="copyTitle()">제목 복사하기</button>
                 </div>
             </div>
@@ -309,7 +309,7 @@
             toggleHighlight(document.getElementById('preview-manager'), manager === '{담당자명}');
 
             // 제목 반영
-            document.getElementById('title-preview').innerText = `[소스링크] 🗓️ ${company}의 온보딩 일정이 확정되었습니다.`;
+            document.getElementById('title-preview').innerHTML = `[소스링크] 🗓️ <span class="${company === '{회사명}' ? 'var-fill' : ''}">${company}</span>의 온보딩 일정이 확정되었습니다.`;
         }
 
         function toggleHighlight(el, isDimmed) {

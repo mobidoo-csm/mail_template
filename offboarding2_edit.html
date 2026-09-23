@@ -145,7 +145,7 @@
             <div class="section">
                 <span class="section-label">Email Title</span>
                 <div class="title-card">
-                    <div class="title-preview-text" id="title-preview">[모비두] 📂 {회사명} 백업 데이터 전달 안내</div>
+                    <div class="title-preview-text" id="title-preview">[모비두] 📂 <span class="var-fill">{회사명}</span> 백업 데이터 전달 안내</div>
                     <button class="btn btn-dark" onclick="copyTitle()">제목 복사하기</button>
                 </div>
             </div>
@@ -201,7 +201,7 @@
 
             document.getElementById('p-company-intro').innerText = company;
             document.getElementById('p-manager').innerText = manager;
-            document.getElementById('title-preview').innerText = `[모비두] 📂 ${company} 백업 데이터 전달 안내`;
+            document.getElementById('title-preview').innerHTML = `[모비두] 📂 <span class="${company === '{회사명}' ? 'var-fill' : ''}">${company}</span> 백업 데이터 전달 안내`;
 
             const introClause = document.getElementById('p-intro-clause');
             const sftpSection = document.getElementById('p-sftp-section');

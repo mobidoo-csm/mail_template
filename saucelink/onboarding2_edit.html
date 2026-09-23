@@ -147,7 +147,7 @@
             <div class="section">
                 <span class="section-label">Email Title</span>
                 <div class="title-card">
-                    <div class="title-preview-text" id="title-preview">[소스링크] 📝 {회사명}의 온보딩 리뷰 및 링크 사용 안내를 전달드립니다</div>
+                    <div class="title-preview-text" id="title-preview">[소스링크] 📝 <span class="var-fill">{회사명}</span>의 온보딩 리뷰 및 링크 사용 안내를 전달드립니다</div>
                     <button class="btn btn-dark" onclick="copyTitle()">제목 복사하기</button>
                 </div>
             </div>
@@ -223,7 +223,7 @@
             pIntro.innerText = company;
             pBottom.innerText = company;
             pManager.innerText = manager;
-            document.getElementById('title-preview').innerText = `[소스링크] 📝 ${company}의 온보딩 리뷰 및 링크 사용 안내를 전달드립니다`;
+            document.getElementById('title-preview').innerHTML = `[소스링크] 📝 <span class="${company === '{회사명}' ? 'var-fill' : ''}">${company}</span>의 온보딩 리뷰 및 링크 사용 안내를 전달드립니다`;
 
             toggleHighlight(pIntro, company === '{회사명}');
             toggleHighlight(pBottom, company === '{회사명}'); // 수정된 부분: 하단 회사명도 하이라이트 끄기 연동

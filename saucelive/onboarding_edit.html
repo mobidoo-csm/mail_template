@@ -204,7 +204,7 @@
             <div class="section">
                 <span class="section-label">Email Title</span>
                 <div class="title-card">
-                    <div class="title-preview-text" id="title-preview">[소스라이브] 🗓️ {회사명}의 온보딩 일정이 확정되었습니다.</div>
+                    <div class="title-preview-text" id="title-preview">[소스라이브] 🗓️ <span class="var-fill">{회사명}</span>의 온보딩 일정이 확정되었습니다.</div>
                     <button class="btn btn-dark" style="padding:10px; font-size:13px;" onclick="copyTitle()">제목 복사하기</button>
                 </div>
             </div>
@@ -259,7 +259,7 @@
             document.getElementById('p-manager').innerText = manager;
             document.getElementById('p-account-id').innerText = accountId;
             document.getElementById('p-password').innerText = password;
-            document.getElementById('title-preview').innerText = `[소스라이브] 🗓️ ${company}의 온보딩 일정이 확정되었습니다.`;
+            document.getElementById('title-preview').innerHTML = `[소스라이브] 🗓️ <span class="${company === '{회사명}' ? 'var-fill' : ''}">${company}</span>의 온보딩 일정이 확정되었습니다.`;
 
             // Meeting Logic
             const pPlace = document.getElementById('p-place-name');

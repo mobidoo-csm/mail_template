@@ -284,7 +284,7 @@
             <div class="section">
                 <span class="section-label">Email Title</span>
                 <div class="title-card">
-                    <div class="title-preview-text" id="title-preview">[소스링크] 👋 Welcome to Sauce! {회사명}의 성공적인 어필리에이트 마케팅 여정을 함께합니다</div>
+                    <div class="title-preview-text" id="title-preview">[소스링크] 👋 Welcome to Sauce! <span class="var-fill">{회사명}</span>의 성공적인 어필리에이트 마케팅 여정을 함께합니다</div>
                     <button class="btn btn-dark" onclick="copyTitle()">제목 복사하기</button>
                 </div>
             </div>
@@ -325,7 +325,7 @@
             company === '{회사명}' ? pCompany.classList.add('var-fill') : pCompany.classList.remove('var-fill');
             manager === '{담당자명}' ? pManager.classList.add('var-fill') : pManager.classList.remove('var-fill');
 
-            document.getElementById('title-preview').innerText = `[소스링크] 👋 Welcome to Sauce! ${company}의 성공적인 어필리에이트 마케팅 여정을 함께합니다`;
+            document.getElementById('title-preview').innerHTML = `[소스링크] 👋 Welcome to Sauce! <span class="${company === '{회사명}' ? 'var-fill' : ''}">${company}</span>의 성공적인 어필리에이트 마케팅 여정을 함께합니다`;
         }
 
         function copyTitle() {
