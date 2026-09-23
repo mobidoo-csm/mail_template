@@ -9,7 +9,7 @@
         :root {
             --sauce-orange: #ff5f00;
             --sauce-orange-hover: #e65600;
-            --sauce-black: #00020f;
+            --sauce-black: #111827;
             --bg-workspace: #f3f4f6;
             --panel-bg: #ffffff;
             --text-main: #111827;
@@ -25,14 +25,15 @@
         .preview-area { flex: 1; padding: 40px; overflow-y: auto; display: flex; justify-content: center; scroll-behavior: smooth; }
 
         /* 우측 제어 패널 */
-        .control-panel { width: 440px; background-color: var(--panel-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.03); }
-        .panel-header { padding: 30px 25px; background-color: var(--sauce-black); color: #ffffff; }
-        .panel-header h2 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--sauce-orange); }
-        .panel-header p { margin: 8px 0 0 0; font-size: 13px; opacity: 0.6; font-weight: 500; }
+        .control-panel { width: 420px; background-color: var(--panel-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.03); }
+        .panel-header { padding: 30px 25px; background-color: #ffffff; border-bottom: 1px solid var(--border-color); position: relative; }
+        .panel-header::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background-color: var(--sauce-orange); }
+        .panel-header h2 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--sauce-black); }
+        .panel-header p { margin: 6px 0 0 0; font-size: 13px; color: var(--text-sub); font-weight: 500; }
         .panel-content { padding: 30px 25px; flex: 1; overflow-y: auto; }
 
         .section { margin-bottom: 35px; }
-        .section-label { font-size: 12px; font-weight: 800; color: var(--sauce-orange); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 1px; }
+        .section-label { font-size: 12px; font-weight: 800; color: var(--sauce-orange); text-transform: uppercase; margin-bottom: 15px; display: block; letter-spacing: 1px; }
 
         .title-card { background-color: #f9fafb; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
         .title-preview-text { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.5; margin-bottom: 15px; word-break: break-all; }
@@ -40,13 +41,13 @@
         /* 입력창 스타일 */
         .input-group { margin-bottom: 20px; }
         .input-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
-        .input-group input, .input-group textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; font-family: inherit; }
-        .input-group textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+        .input-group input, .input-group textarea { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; font-family: inherit; }
+        .input-group textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
         .input-group input:focus, .input-group textarea:focus { border-color: var(--sauce-orange); outline: none; box-shadow: 0 0 0 4px rgba(255, 95, 0, 0.1); }
 
         /* 동적 카드 스타일 */
-        .dynamic-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 15px; position: relative; }
-        .btn-del { position: absolute; top: 15px; right: 15px; color: #ef4444; background: none; border: none; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline; }
+        .dynamic-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; position: relative; }
+        .btn-del { position: absolute; top: 18px; right: 20px; color: #ef4444; background: none; border: none; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline; }
         
         .img-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .img-item { width: 50px; height: 50px; border-radius: 6px; border: 1px solid #ddd; position: relative; overflow: hidden; }
@@ -54,11 +55,11 @@
         .img-item .del-img { position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 10px; cursor: pointer; padding: 1px 3px; }
 
         .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s; }
-        .btn-orange { background-color: var(--sauce-orange); color: white; margin-bottom: 12px; }
+        .btn-orange { background-color: var(--sauce-orange); color: white; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(255, 95, 0, 0.2); }
         .btn-orange:hover { background-color: var(--sauce-orange-hover); transform: translateY(-1px); }
         .btn-dark { background-color: var(--btn-dark); color: white; padding: 10px; font-size: 13px; }
-        .btn-add { background-color: #f1f5f9; color: var(--btn-dark); font-size: 13px; border: 1px dashed #cbd5e1; margin-bottom: 20px; }
-        .btn-img-upload { background: #f8f9fa; color: #475569; padding: 6px 10px; font-size: 10px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; display: inline-flex; margin-top: 5px; }
+        .btn-add { background-color: #f1f5f9; color: var(--btn-dark); font-size: 13px; border: 1px dashed #cbd5e1; margin-top: -10px; margin-bottom: 20px; }
+        .btn-img-upload { background: #f8f9fa; color: #475569; padding: 8px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; display: inline-flex; }
 
         .help-text { font-size: 12px; color: var(--text-sub); text-align: center; margin-top: 15px; line-height: 1.6; }
         #toast { visibility: hidden; min-width: 220px; background-color: var(--sauce-black); color: #fff; text-align: center; border-radius: 50px; padding: 14px 24px; position: fixed; z-index: 2000; left: 50%; bottom: 40px; transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
